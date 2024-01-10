@@ -1,0 +1,7 @@
+/**/__pycache__/
+/**/dist/
+/resource/data/
+credentials.env
+/**/*.egg-info/
+/**/build/
+config.yaml

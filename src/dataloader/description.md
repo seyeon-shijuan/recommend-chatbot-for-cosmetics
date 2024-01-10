@@ -1,0 +1,14 @@
+### 데이터 수집 및 전처리 컴포넌트 패키지
+- collection
+  - scraping
+  - api
+- preprocessing
+  - clearning
+  - extract (stemmping, Lemmatization)
+  - stopword
+  - tokenization
+  - encoding
+  - vectorization
+- load
+  - save(csv, etc) -> /resource/data/
+  - insert db
