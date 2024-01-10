@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-class ChatData():
+class ChatRequest():
     
     def __init__(self, query):
         self.query = query
@@ -8,11 +8,11 @@ class ChatData():
 class ChatbotAPIInterface(ABC):
     
     @abstractmethod
-    def query(self, data: ChatData):
+    def query(self, data: ChatRequest):
         pass
     
 class ChatbotAPIRequest(ChatbotAPIInterface):
     
     # override
-    def query(self, data: ChatData):
+    def query(self, data: ChatRequest):
         pass

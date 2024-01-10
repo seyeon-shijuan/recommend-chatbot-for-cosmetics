@@ -1,13 +1,12 @@
 from setuptools import setup
 
 setup(
-    name="cosmetic-chat-app",
+    name="cosmetic-rec-app",
     version="0.1",
-    description='cosmetics chatbot',
+    description='cosmetics recommendation system',
     packages=[
         "src", 
-        "src/api",
-        "src/model"
+        "src/api"
     ],
     install_requires=[
         "configparser",
@@ -16,7 +15,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'cosmetic-chat = src.main:start',
+            'cosmetic-rec = src.main:start',
         ],
     }
 )
