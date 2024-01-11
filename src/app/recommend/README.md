@@ -7,7 +7,7 @@
   2. root 경로에서 `pip install .`
   3. `cosmetic-rec` 커맨드로 애플리케이션 실행
 
-# run chatbot
+# run recommend
 - `$ sh run.sh`
   - default port: 8000
 
