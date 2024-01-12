@@ -44,6 +44,24 @@ class Scrape():
     
 class Regex():
     
+    url_pattern = re.compile(r'https?://\S+|www\.\S+')
+    
     def remove_html_tags(html):
-        clean_text = re.sub(r'<.*?>', '', html)
-        return clean_text
+        cleaned_text = re.sub(r'<.*?>', '', html)
+        return cleaned_text
+    
+    def remove_escape(text):
+        cleaned_text = re.sub(r"(\w+)-\n(\w+)", r"\1\2", text)
+        return cleaned_text
+    
+    def remove_escape_unicode(text):
+        cleaned_text = re.sub(r'\\[tn]|\\u200b', '', text)
+        return cleaned_text
+    
+    def remove_escape_unicode2(text):
+        cleaned_text = re.sub(r'[\n\t\u200b]', '', text)
+        return cleaned_text
+    
+    def remove_url(text):
+        cleaned_text = re.sub(Regex.url_pattern, "", text)
+        return cleaned_text

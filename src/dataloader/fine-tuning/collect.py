@@ -1,6 +1,8 @@
 import configparser
-from util import Request, Scrape
-from dto import NaverQueryParameter, Naver지식IN
+from util import Request
+from dto import NaverQueryParameter, Naver지식IN, FetchType
+import pandas as pd
+from tqdm import tqdm
 
 config = configparser.ConfigParser()
 config.read("src/dataloader/data_config.env")
@@ -13,37 +15,52 @@ request = Request(base_url="https://openapi.naver.com")
 
 headers = {
     "Accept": "application/json",
-    "X-Naver-Client-Id": naver_client_id,  # 예시: 인증 토큰 헤더
-    "X-Naver-Client-Secret": naver_client_secret,  # 요청 데이터의 타입을 JSON으로 지정하는 헤더
+    "X-Naver-Client-Id": naver_client_id,
+    "X-Naver-Client-Secret": naver_client_secret,
 }
 
-query_parameter = NaverQueryParameter(query="화장품")
+naver_in_list = []
 
-response = request.get(url=f"/v1/search/kin.json?{query_parameter}", headers=headers)
-json = response.json()
+keywords = [
+    "지성 추천",
+    "건성 추천",
+    "복합성 추천",
+    "화장품 트러블",
+    "화장품 부작용"
+]
 
-naver_in = Naver지식IN(json=json)
-# print(naver_in)
-count = 0
-scrape = Scrape()
-for item in naver_in.items:
-    soup = scrape.get_html(resource_path=item.link)
-    c = soup.select_one("div.checkText") # 
-    if c is not None:
-        count += 1
-print(f"count = {count}")
-# soup = scrape.get_html(resource_path=naver_in.items[1].link)
-# print(naver_in.items[1].link)
-# al = soup.select_one("div._answerList")
-# print(al)
-# c = soup.select_one("div.checkText") # 
-# count = 0
-# if c is not None:
-#     count += 1
-# # print(c.text)
-# q = soup.select_one("div.c-heading__content")
-# a = soup.select("div.se-main-container")
-# # print(q.text)
-# # for aaa in a:
-# #     print("======답변======")
-# #     print(aaa)
+for keyword in keywords:
+    
+    print(f"start fetch keyword: {keyword}")
+    
+    query_parameter = NaverQueryParameter(query=keyword, display=99, start=1)
+    response = request.get(url=f"/v1/search/kin.json?{query_parameter}", headers=headers)
+    json = response.json()
+    naver_in = Naver지식IN(json=json)
+    
+    naver_in_list.append(naver_in)
+
+    display_unit_count = 100
+    start = 100
+    end = 1000
+        
+    while start <= end:
+        query_parameter = NaverQueryParameter(query=keyword, display=display_unit_count, start=start)
+        response = request.get(url=f"/v1/search/kin.json?{query_parameter}", headers=headers)
+        json = response.json()
+        naver_in = Naver지식IN(json=json)
+        naver_in_list.append(naver_in)
+        start += display_unit_count
+        
+    print(f"end fetch")
+    
+data = pd.DataFrame(columns=["instruction", "output"])
+
+for naver_in in tqdm(naver_in_list, desc="inprogress"):
+    fetch_df = pd.DataFrame(data=naver_in.fetch_item(fetch_type=FetchType.SINGLE), columns=["instruction", "output"])
+    pd.concat([data, fetch_df], axis=0, ignore_index=True)
+    
+data.to_csv('naver.csv', index=False)
+
+print(len(data))
+print(data.head())

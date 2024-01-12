@@ -1,0 +1,66 @@
+start fetch keyword: 지성 추천
+Request URL - /v1/search/kin.json?query=%EC%A7%80%EC%84%B1+%EC%B6%94%EC%B2%9C&display=99&start=1&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%EC%A7%80%EC%84%B1+%EC%B6%94%EC%B2%9C&display=100&start=100&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%EC%A7%80%EC%84%B1+%EC%B6%94%EC%B2%9C&display=100&start=200&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%EC%A7%80%EC%84%B1+%EC%B6%94%EC%B2%9C&display=100&start=300&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%EC%A7%80%EC%84%B1+%EC%B6%94%EC%B2%9C&display=100&start=400&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%EC%A7%80%EC%84%B1+%EC%B6%94%EC%B2%9C&display=100&start=500&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%EC%A7%80%EC%84%B1+%EC%B6%94%EC%B2%9C&display=100&start=600&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%EC%A7%80%EC%84%B1+%EC%B6%94%EC%B2%9C&display=100&start=700&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%EC%A7%80%EC%84%B1+%EC%B6%94%EC%B2%9C&display=100&start=800&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%EC%A7%80%EC%84%B1+%EC%B6%94%EC%B2%9C&display=100&start=900&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%EC%A7%80%EC%84%B1+%EC%B6%94%EC%B2%9C&display=100&start=1000&sort=sim (200)
+end fetch
+start fetch keyword: 건성 추천
+Request URL - /v1/search/kin.json?query=%EA%B1%B4%EC%84%B1+%EC%B6%94%EC%B2%9C&display=99&start=1&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%EA%B1%B4%EC%84%B1+%EC%B6%94%EC%B2%9C&display=100&start=100&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%EA%B1%B4%EC%84%B1+%EC%B6%94%EC%B2%9C&display=100&start=200&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%EA%B1%B4%EC%84%B1+%EC%B6%94%EC%B2%9C&display=100&start=300&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%EA%B1%B4%EC%84%B1+%EC%B6%94%EC%B2%9C&display=100&start=400&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%EA%B1%B4%EC%84%B1+%EC%B6%94%EC%B2%9C&display=100&start=500&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%EA%B1%B4%EC%84%B1+%EC%B6%94%EC%B2%9C&display=100&start=600&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%EA%B1%B4%EC%84%B1+%EC%B6%94%EC%B2%9C&display=100&start=700&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%EA%B1%B4%EC%84%B1+%EC%B6%94%EC%B2%9C&display=100&start=800&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%EA%B1%B4%EC%84%B1+%EC%B6%94%EC%B2%9C&display=100&start=900&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%EA%B1%B4%EC%84%B1+%EC%B6%94%EC%B2%9C&display=100&start=1000&sort=sim (200)
+end fetch
+start fetch keyword: 복합성 추천
+Request URL - /v1/search/kin.json?query=%EB%B3%B5%ED%95%A9%EC%84%B1+%EC%B6%94%EC%B2%9C&display=99&start=1&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%EB%B3%B5%ED%95%A9%EC%84%B1+%EC%B6%94%EC%B2%9C&display=100&start=100&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%EB%B3%B5%ED%95%A9%EC%84%B1+%EC%B6%94%EC%B2%9C&display=100&start=200&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%EB%B3%B5%ED%95%A9%EC%84%B1+%EC%B6%94%EC%B2%9C&display=100&start=300&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%EB%B3%B5%ED%95%A9%EC%84%B1+%EC%B6%94%EC%B2%9C&display=100&start=400&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%EB%B3%B5%ED%95%A9%EC%84%B1+%EC%B6%94%EC%B2%9C&display=100&start=500&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%EB%B3%B5%ED%95%A9%EC%84%B1+%EC%B6%94%EC%B2%9C&display=100&start=600&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%EB%B3%B5%ED%95%A9%EC%84%B1+%EC%B6%94%EC%B2%9C&display=100&start=700&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%EB%B3%B5%ED%95%A9%EC%84%B1+%EC%B6%94%EC%B2%9C&display=100&start=800&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%EB%B3%B5%ED%95%A9%EC%84%B1+%EC%B6%94%EC%B2%9C&display=100&start=900&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%EB%B3%B5%ED%95%A9%EC%84%B1+%EC%B6%94%EC%B2%9C&display=100&start=1000&sort=sim (200)
+end fetch
+start fetch keyword: 화장품 트러블
+Request URL - /v1/search/kin.json?query=%ED%99%94%EC%9E%A5%ED%92%88+%ED%8A%B8%EB%9F%AC%EB%B8%94&display=99&start=1&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%ED%99%94%EC%9E%A5%ED%92%88+%ED%8A%B8%EB%9F%AC%EB%B8%94&display=100&start=100&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%ED%99%94%EC%9E%A5%ED%92%88+%ED%8A%B8%EB%9F%AC%EB%B8%94&display=100&start=200&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%ED%99%94%EC%9E%A5%ED%92%88+%ED%8A%B8%EB%9F%AC%EB%B8%94&display=100&start=300&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%ED%99%94%EC%9E%A5%ED%92%88+%ED%8A%B8%EB%9F%AC%EB%B8%94&display=100&start=400&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%ED%99%94%EC%9E%A5%ED%92%88+%ED%8A%B8%EB%9F%AC%EB%B8%94&display=100&start=500&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%ED%99%94%EC%9E%A5%ED%92%88+%ED%8A%B8%EB%9F%AC%EB%B8%94&display=100&start=600&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%ED%99%94%EC%9E%A5%ED%92%88+%ED%8A%B8%EB%9F%AC%EB%B8%94&display=100&start=700&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%ED%99%94%EC%9E%A5%ED%92%88+%ED%8A%B8%EB%9F%AC%EB%B8%94&display=100&start=800&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%ED%99%94%EC%9E%A5%ED%92%88+%ED%8A%B8%EB%9F%AC%EB%B8%94&display=100&start=900&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%ED%99%94%EC%9E%A5%ED%92%88+%ED%8A%B8%EB%9F%AC%EB%B8%94&display=100&start=1000&sort=sim (200)
+end fetch
+start fetch keyword: 화장품 부작용
+Request URL - /v1/search/kin.json?query=%ED%99%94%EC%9E%A5%ED%92%88+%EB%B6%80%EC%9E%91%EC%9A%A9&display=99&start=1&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%ED%99%94%EC%9E%A5%ED%92%88+%EB%B6%80%EC%9E%91%EC%9A%A9&display=100&start=100&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%ED%99%94%EC%9E%A5%ED%92%88+%EB%B6%80%EC%9E%91%EC%9A%A9&display=100&start=200&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%ED%99%94%EC%9E%A5%ED%92%88+%EB%B6%80%EC%9E%91%EC%9A%A9&display=100&start=300&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%ED%99%94%EC%9E%A5%ED%92%88+%EB%B6%80%EC%9E%91%EC%9A%A9&display=100&start=400&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%ED%99%94%EC%9E%A5%ED%92%88+%EB%B6%80%EC%9E%91%EC%9A%A9&display=100&start=500&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%ED%99%94%EC%9E%A5%ED%92%88+%EB%B6%80%EC%9E%91%EC%9A%A9&display=100&start=600&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%ED%99%94%EC%9E%A5%ED%92%88+%EB%B6%80%EC%9E%91%EC%9A%A9&display=100&start=700&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%ED%99%94%EC%9E%A5%ED%92%88+%EB%B6%80%EC%9E%91%EC%9A%A9&display=100&start=800&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%ED%99%94%EC%9E%A5%ED%92%88+%EB%B6%80%EC%9E%91%EC%9A%A9&display=100&start=900&sort=sim (200)
+Request URL - /v1/search/kin.json?query=%ED%99%94%EC%9E%A5%ED%92%88+%EB%B6%80%EC%9E%91%EC%9A%A9&display=100&start=1000&sort=sim (200)
+end fetch
+inprogress:   0%|          | 0/55 [00:00<?, ?it/s]inprogress:   2%|▏         | 1/55 [00:25<23:10, 25.76s/it]inprogress:   4%|▎         | 2/55 [00:52<23:16, 26.34s/it]inprogress:   5%|▌         | 3/55 [01:22<24:06, 27.83s/it]inprogress:   7%|▋         | 4/55 [01:52<24:28, 28.79s/it]inprogress:   9%|▉         | 5/55 [02:21<24:03, 28.87s/it]inprogress:  11%|█         | 6/55 [02:49<23:24, 28.67s/it]inprogress:  13%|█▎        | 7/55 [03:19<23:07, 28.91s/it]inprogress:  15%|█▍        | 8/55 [03:51<23:35, 30.12s/it]
