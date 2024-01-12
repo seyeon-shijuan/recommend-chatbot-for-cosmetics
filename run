@@ -3,7 +3,7 @@
 readonly type=$1
 if [ $type = "chat" ]; then
     cd ./src/app/chatbot
-    sh run.sh
+    sh run
 elif [ $type = "rec" ]; then
     cd ./src/app/recommend
 else
