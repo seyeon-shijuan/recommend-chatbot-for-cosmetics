@@ -1,0 +1,11 @@
+#!/bin/bash
+
+readonly type=$1
+if [ $type = "chat" ]; then
+    cd ./src/app/chatbot
+    sh run.sh
+elif [ $type = "rec" ]; then
+    cd ./src/app/recommend
+else
+    echo "chat 또는 rec 만 입력해주세요"
+fi

@@ -8,8 +8,7 @@
   3. `cosmetic-rec` 커맨드로 애플리케이션 실행
 
 # run recommend
-- `$ sh run.sh`
-  - default port: 8000
+- `$ sh run`
 
 # settings
 - config.env.example 같은 형식으로 config.env 생성하여 사용
