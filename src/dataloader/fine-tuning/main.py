@@ -19,6 +19,7 @@ def save_file(data: pd.DataFrame, filename: str):
     Search keywords: {search_keywords}
     Instruction: {instruction}
     Columns: {list(data.columns)}
+    Count: {len(data)}
     """
     FileUtil.save_txt(text=data_info, path=f"{filename}-info")
     
