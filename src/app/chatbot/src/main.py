@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from src.api.inference_api import inferenceAPIRouter
+from src.api.inference_api import chatbotAPIRouter
 from uvicorn import run
 import configparser
 
@@ -14,7 +14,10 @@ server_port = int(server["port"])
 def start():
     run(app, port=server_port)
 
-@app.get("/test")
-def test():
-    return inferenceAPIRouter.inference()
+@app.get(path="/test")
+def test(text: str = "test"):
+    return chatbotAPIRouter.test(text)
 
+@app.get(path="/prompt")
+def prompt(prompt):
+    return chatbotAPIRouter.prompt(prompt)

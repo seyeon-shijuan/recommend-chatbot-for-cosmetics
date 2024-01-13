@@ -1,3 +1,5 @@
+from src.api.llm_serivce import LLMService
+
 class Request():
     
     def __init__(self, query):
@@ -8,9 +10,20 @@ class InferenceResponse():
     def __init__(self, response: str):
         self.response = response
 
-class InferenceAPIRouter:
+llm_service = LLMService()
 
-    def inference(self):
-        return { "response": "chatbot test" }
+class ChatbotAPIRouter:
     
-inferenceAPIRouter = InferenceAPIRouter()
+    def __init__(self, llm_service):
+        self.llm_service = llm_service
+        
+    def test(self, text):
+        return {
+            "test": text
+        }
+
+    def prompt(self, prompt: dict):
+        response = self.llm_service.inference(prompt=prompt)
+        return response
+
+chatbotAPIRouter = ChatbotAPIRouter(llm_service=llm_service)

@@ -1,0 +1,13 @@
+# recommend test API
+GET http://localhost:8081/test?text=안녕
+
+###
+
+# 협업 필터링 API
+GET http://localhost:8081/collabo/filters?product_name=토너
+
+###
+
+# 상품 조회 API
+
+GET http://localhost:8081/product?id=2

@@ -1,0 +1,7 @@
+# chatbot test API
+GET http://localhost:8080/test?text=안녕
+
+###
+
+# prompt API
+GET http://localhost:8080/prompt?prompt=
