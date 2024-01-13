@@ -1,7 +1,7 @@
 from functools import reduce
 from urllib.parse import urlencode
 from enum import Enum
-from util import Scrape, Regex
+from util import Scrape, Regex, StringUtil
 from typing import Callable, Union
 
 class Item():
@@ -11,9 +11,8 @@ class Item():
         self.link = item["link"]
         self.description = item["description"]
         
-    def load_qna(self, loader: Scrape, function: Callable[[Scrape, str], tuple[str, list[str]]]) -> Union[tuple[str, str], tuple[str, list[str]]]:
-        question, answer = function(loader, self.link)
-        return question, answer
+    def load_qna(self, loader: Scrape, function: Callable[[Scrape, str], Union[tuple[str, str], tuple[str, str, str]]]) -> Union[tuple[str, str], tuple[str, str, str]]:
+        return function(loader, self.link)
         
     def __str__(self):
         return f"""
@@ -24,8 +23,8 @@ class Item():
     """
 
 class FetchType(Enum):
-    SINGLE = "S"
-    PAIR = "P"
+    SINGLE = "single"
+    PAIR = "pair"
 
 class Naver지식IN():
     
@@ -62,9 +61,7 @@ class Naver지식IN():
         
         question = soup.select_one("div.c-heading__content")
         if question is not None:
-            question = Regex.remove_html_tags(question.text)
-            question = Regex.remove_escape_unicode2(question)
-            question = Regex.remove_url(question)
+            question = StringUtil.clean(question.text)
         
             adopt_check = soup.select_one("div.checkText")
             if adopt_check is not None:
@@ -72,39 +69,63 @@ class Naver지식IN():
                 answer = parent_answer.select_one("div.se-main-container")
                 
                 if answer is not None:
-                    answer = Regex.remove_html_tags(answer.text)
-                    answer = Regex.remove_escape_unicode2(answer)
-                    answer = Regex.remove_url(answer)
+                    answer = StringUtil.clean(answer.text)
 
         return question, answer
 
-    def load_multiple_answer(loader: Scrape, link: str) -> tuple[str, str]:
-        soup = loader.get_html(resource_path=link)
-        q = soup.select_one("div.c-heading__content")
-        adopt_check = soup.select_one("div.checkText")
-        if adopt_check is not None:
-            # 채택 답변
-            adopt_check.find_parent(name="div", attrs={"class": "answer-content__item"})
-            pass
+    def load_pair_answer(loader: Scrape, link: str) -> tuple[str, tuple[str, str]]:
+        
+        soup = loader.get_html(resource_path=link, verbose=0)
+        question , adopt_answer, other_answer = None, None, None
+        
+        question = soup.select_one("div.c-heading__content")
+        if question is not None:
+            question = StringUtil.clean(question.text)
+        
+            adopt_check = soup.select_one("div.checkText")
+            if adopt_check is not None:
+                
+                
+                parent_answer = adopt_check.find_parent(name="div", attrs={"class": "answer-content__item"})
+                adopt_answer = parent_answer.select_one("div.se-main-container")
+                
+                answer_list = soup.select("div.answer-content__item")
+                
+                filtered_answer_list = []
+                for answer in answer_list:
+                    profile_card = answer.select_one("div.profile_card")
+                    text = profile_card.text.strip()
+                    if not text.startswith("사용자 신고"):
+                        filtered_answer_list.append(answer)
+                    
+                if adopt_answer is not None:
+                    adopt_answer = StringUtil.clean(adopt_answer.text)
+                
+                if len(filtered_answer_list) > 2:
+                    other_answer = filtered_answer_list[-1].select_one("div.se-main-container")
+                    if other_answer is not None:
+                        other_answer = StringUtil.clean(other_answer.text)
+
+        return question, adopt_answer, other_answer
         
     
-    def fetch_item(self, fetch_type: FetchType, range: slice = slice(None)) -> list[tuple[str, str] | tuple[str, list[str]]]:
+    def fetch_item(self, fetch_type: FetchType, range: slice = slice(None)) -> list[tuple[str, str] | tuple[str, tuple[str]]]:
         
         load_function = None
         if fetch_type == FetchType.SINGLE:
             load_function = Naver지식IN.load_single_answer
         elif fetch_type == FetchType.PAIR:
-            load_function = Naver지식IN.load_multiple_answer
+            load_function = Naver지식IN.load_pair_answer
         else:
             raise ValueError("SINGLE or PAIR only.")
         
-        list = [   
+        qna_list = [
             item.load_qna(loader=self.loader, function=load_function) 
             for item in self.items[range] 
         ]
         
-        filter_qna = lambda qna: qna[0] is not None and qna[1] is not None
-        filtered_list = filter(filter_qna, list)
+        filter_qna = lambda qna: all(val is not None for val in qna)
+        filtered_list = filter(filter_qna, qna_list)
         return filtered_list
     
 class NaverSort(Enum):

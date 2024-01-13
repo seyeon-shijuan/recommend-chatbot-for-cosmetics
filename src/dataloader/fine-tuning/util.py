@@ -2,6 +2,14 @@ import requests
 from enum import Enum
 from bs4 import BeautifulSoup
 import re
+from datetime import datetime
+
+class DateUtil():
+    
+    def get_current_time_form() -> str:
+        current_time = datetime.now()
+        formatted_time = current_time.strftime("%Y-%m-%d %H.%M.%S")
+        return formatted_time
 
 class Request():
     
@@ -44,24 +52,37 @@ class Scrape():
     
 class Regex():
     
-    url_pattern = re.compile(r'https?://\S+|www\.\S+')
+    url_pattern = re.compile(r"https?://\S+|www\.\S+")
+    html_tag_pattern = re.compile(r"<.*?>")
+    escape_pattern = re.compile(r"(\w+)-\n(\w+)")
+    escape_unicode_pattern = re.compile(r"\\[tn]|\\u200b")
+    escape_unicode2_pattern = re.compile(r"[\n\t\u200b]")
     
     def remove_html_tags(html):
-        cleaned_text = re.sub(r'<.*?>', '', html)
+        cleaned_text = re.sub(Regex.html_tag_pattern, "", html)
         return cleaned_text
     
     def remove_escape(text):
-        cleaned_text = re.sub(r"(\w+)-\n(\w+)", r"\1\2", text)
+        cleaned_text = re.sub(Regex.escape_pattern, r"\1\2", text)
         return cleaned_text
     
     def remove_escape_unicode(text):
-        cleaned_text = re.sub(r'\\[tn]|\\u200b', '', text)
+        cleaned_text = re.sub(Regex.escape_unicode_pattern, "", text)
         return cleaned_text
     
     def remove_escape_unicode2(text):
-        cleaned_text = re.sub(r'[\n\t\u200b]', '', text)
+        cleaned_text = re.sub(Regex.escape_unicode2_pattern, "", text)
         return cleaned_text
     
     def remove_url(text):
         cleaned_text = re.sub(Regex.url_pattern, "", text)
         return cleaned_text
+    
+class StringUtil():
+    
+    def clean(text: str) -> str:
+        text = Regex.remove_html_tags(text)
+        text = Regex.remove_escape_unicode2(text)
+        text = Regex.remove_url(text)
+        text = text.strip()
+        return text
