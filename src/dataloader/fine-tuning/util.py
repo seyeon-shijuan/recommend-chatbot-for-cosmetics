@@ -3,6 +3,7 @@ from enum import Enum
 from bs4 import BeautifulSoup
 import re
 from datetime import datetime
+import pandas as pd
 
 class DateUtil():
     
@@ -86,3 +87,17 @@ class StringUtil():
         text = Regex.remove_url(text)
         text = text.strip()
         return text
+    
+class FileUtil():
+    
+    def save_jsonl(data: pd.DataFrame, path: str): 
+        with open(f"{path}.jsonl", "w", encoding="utf-8") as file:
+            for _, row in data.iterrows():
+                file.write(row.to_json(force_ascii=False) + '\n')
+                
+    def save_csv(data: pd.DataFrame, path: str, sep=",", index=False):
+        data.to_csv(path_or_buf=f"{path}.csv", sep=sep, index=index)
+        
+    def save_txt(text: str, path: str):
+        with open(f"{path}.txt", "w", encoding="utf-8") as file:
+            file.write(text)
