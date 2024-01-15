@@ -137,6 +137,7 @@ def randing():
                 message_placeholder = st.empty()
 
                 # Simulate stream of response with milliseconds delay
+                full_response = ""
                 for chunk in assistant_response.split():
                     full_response += chunk + " "
                     time.sleep(0.08)
