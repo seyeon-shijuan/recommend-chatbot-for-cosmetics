@@ -15,3 +15,7 @@
 
 # caution
 - 패키지 경로 추가될 때마다 `setup.py` 의 `packages`에 경로 추가 필요...
+
+# API
+- `recommend.http` 참고
+  - VS Code Extension 에서 `REST Client` 설치 후 http 파일 내 SendRequest 클릭으로 response 확인

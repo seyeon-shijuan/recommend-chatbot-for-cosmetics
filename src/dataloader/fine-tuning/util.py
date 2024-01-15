@@ -2,6 +2,15 @@ import requests
 from enum import Enum
 from bs4 import BeautifulSoup
 import re
+from datetime import datetime
+import pandas as pd
+
+class DateUtil():
+    
+    def get_current_time_form() -> str:
+        current_time = datetime.now()
+        formatted_time = current_time.strftime("%Y-%m-%d %H.%M.%S")
+        return formatted_time
 
 class Request():
     
@@ -44,6 +53,51 @@ class Scrape():
     
 class Regex():
     
+    url_pattern = re.compile(r"https?://\S+|www\.\S+")
+    html_tag_pattern = re.compile(r"<.*?>")
+    escape_pattern = re.compile(r"(\w+)-\n(\w+)")
+    escape_unicode_pattern = re.compile(r"\\[tn]|\\u200b")
+    escape_unicode2_pattern = re.compile(r"[\n\t\u200b]")
+    
     def remove_html_tags(html):
-        clean_text = re.sub(r'<.*?>', '', html)
-        return clean_text
+        cleaned_text = re.sub(Regex.html_tag_pattern, "", html)
+        return cleaned_text
+    
+    def remove_escape(text):
+        cleaned_text = re.sub(Regex.escape_pattern, r"\1\2", text)
+        return cleaned_text
+    
+    def remove_escape_unicode(text):
+        cleaned_text = re.sub(Regex.escape_unicode_pattern, "", text)
+        return cleaned_text
+    
+    def remove_escape_unicode2(text):
+        cleaned_text = re.sub(Regex.escape_unicode2_pattern, "", text)
+        return cleaned_text
+    
+    def remove_url(text):
+        cleaned_text = re.sub(Regex.url_pattern, "", text)
+        return cleaned_text
+    
+class StringUtil():
+    
+    def clean(text: str) -> str:
+        text = Regex.remove_html_tags(text)
+        text = Regex.remove_escape_unicode2(text)
+        text = Regex.remove_url(text)
+        text = text.strip()
+        return text
+    
+class FileUtil():
+    
+    def save_jsonl(data: pd.DataFrame, path: str): 
+        with open(f"{path}.jsonl", "w", encoding="utf-8") as file:
+            for _, row in data.iterrows():
+                file.write(row.to_json(force_ascii=False) + '\n')
+                
+    def save_csv(data: pd.DataFrame, path: str, sep=",", index=False):
+        data.to_csv(path_or_buf=f"{path}.csv", sep=sep, index=index)
+        
+    def save_txt(text: str, path: str):
+        with open(f"{path}.txt", "w", encoding="utf-8") as file:
+            file.write(text)

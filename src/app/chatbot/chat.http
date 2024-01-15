@@ -1,0 +1,19 @@
+# chatbot test API
+GET http://localhost:8080/test?text=안녕
+
+###
+
+# prompt API (local)
+POST http://localhost:8080/prompt
+Content-Type: application/json
+
+{
+    "messages": [
+        {
+            "role": "QUESTION",
+            "content": "화장품 아무거나 추천해줘"
+        }
+    ]
+}
+
+###

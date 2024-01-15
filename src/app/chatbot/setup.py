@@ -12,7 +12,11 @@ setup(
     install_requires=[
         "configparser",
         "uvicorn",
-        "fastapi"
+        "fastapi",
+        "pydantic",
+        "transformers",
+        "peft",
+        "pytorch"
     ],
     entry_points={
         'console_scripts': [

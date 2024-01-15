@@ -1,5 +1,6 @@
 from fastapi import FastAPI
-from src.api.inference_api import inferenceAPIRouter
+from src.api.chat_api import chatbotAPIRouter
+from src.api.llm_serivce import Prompt, PromptResponse
 from uvicorn import run
 import configparser
 
@@ -14,7 +15,10 @@ server_port = int(server["port"])
 def start():
     run(app, port=server_port)
 
-@app.get("/test")
-def test():
-    return inferenceAPIRouter.inference()
+@app.get(path="/test")
+def test(text: str = "test"):
+    return chatbotAPIRouter.test(text=text)
 
+@app.post(path="/prompt")
+async def prompt(prompt: Prompt) -> PromptResponse:
+    return chatbotAPIRouter.prompt(prompt=prompt)

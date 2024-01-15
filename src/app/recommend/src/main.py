@@ -15,5 +15,13 @@ def start():
     run(app, port=server_port)
 
 @app.get("/test")
-def test():
-    return recommendationAPIRouter.recommend()
+def test(text: str = "test"):
+    return recommendationAPIRouter.test(text)
+
+@app.get("/collabo/filters")
+def test(product_name: str):
+    return recommendationAPIRouter.recommend_product(product_name=product_name)
+
+@app.get("/product")
+def test(id: int):
+    return recommendationAPIRouter.product_info(product_id=id)
