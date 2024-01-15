@@ -4,8 +4,13 @@ import random
 import time
 import sqlite3
 import requests
+from config import load
+
+config = load()
 
 def randing():
+    
+    prompt_state = []
 
     with st.sidebar:
         openai_api_key = st.text_input("OpenAI API Key", key="chatbot_api_key", type="password")
@@ -17,7 +22,7 @@ def randing():
     st.caption("피부요정 뽀야미에게 맡겨만 주세요!")
 
     # SQLite 데이터베이스 연결
-    conn = sqlite3.connect('user_data.db')
+    conn = sqlite3.connect('resource/data/user_data.db')
     cursor = conn.cursor()
 
     # 테이블 생성 (첫 실행 시 한 번만 실행)
@@ -72,6 +77,28 @@ def randing():
         # Display assistant response in chat message container
         with st.chat_message("assistant", avatar = '🧙‍♂️'):
             full_response = ""
+            
+            api_config = config["api"]
+            
+            chat_api_config = api_config["chat"]
+            recommend_api_config = api_config["recommend"]
+            
+            data = {
+                "state": prompt_state,
+                "text": prompt
+            }
+            response = requests.post(url=f"http://{chat_api_config['host']}:{chat_api_config['port']}/prompt", data=data)
+            
+            if response.status_code == 200:
+                json = response.json()
+                state = json["state"]
+                prompt_state.append(state[-1])
+                answer = json["answer"]
+                
+            else:
+                answer = "서비스 오류가 발생했습니다. 다시 시도해주세요."
+            
+            assistant_response = answer
 
             if "스킨케어 추천" in prompt:
                 #이미지 3개
@@ -94,13 +121,13 @@ def randing():
                         st.markdown(image_with_link, unsafe_allow_html=True)
             
             else:
-                assistant_response = random.choice(
-                    [
-                    "Hello there! How can I assist you today?",
-                    "Hi, human! Is there anything I can help you with?",
-                    "Do you need help?",
-                    ]
-                    )
+                # assistant_response = random.choice(
+                #     [
+                #     "Hello there! How can I assist you today?",
+                #     "Hi, human! Is there anything I can help you with?",
+                #     "Do you need help?",
+                #     ]
+                #     )
 
                 # Display assistant response in chat message container
                 message_placeholder = st.empty()
