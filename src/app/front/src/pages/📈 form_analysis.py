@@ -7,7 +7,7 @@ st.markdown("form_analysis")
 st.sidebar.markdown("📈 form_analysis")
 
 # SQLite 데이터베이스 연결
-conn = sqlite3.connect('user_data.db')
+conn = sqlite3.connect('resource/data/user_data.db')
 
 # 사용자 데이터 불러오기
 df = pd.read_sql_query('SELECT * FROM user_data', conn)
