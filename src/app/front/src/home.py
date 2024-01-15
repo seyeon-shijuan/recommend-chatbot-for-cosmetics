@@ -18,7 +18,7 @@ def randing():
     st.caption("피부요정 뽀야미에게 맡겨만 주세요!")
 
     # SQLite 데이터베이스 연결
-    conn = sqlite3.connect('resource/data/db/user_data.db')
+    conn = sqlite3.connect('user_data.db')
     cursor = conn.cursor()
 
     # 테이블 생성 (첫 실행 시 한 번만 실행)
