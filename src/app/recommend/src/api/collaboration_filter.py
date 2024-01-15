@@ -4,3 +4,5 @@ class CollaborationFilter():
         product_list = []
         # TODO 협업 필터링 구현
         return product_list
+
+collabo_filter = CollaborationFilter()

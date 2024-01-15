@@ -1,14 +1,10 @@
-from src.api.collaboration_filter import CollaborationFilter
-from src.api.product_service import ProductService
+from src.api.collaboration_filter import CollaborationFilter, collabo_filter
+from src.api.product_service import ProductService, product_service
 
 class RecommendationResponse():
     
     def __init__(self, response: str):
         self.response = response
-
-
-collabo_filter = CollaborationFilter()
-product_service = ProductService()
 
 class RecommendationAPIRouter:
     

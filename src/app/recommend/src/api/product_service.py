@@ -7,3 +7,5 @@ class ProductService():
             "id": product_id,
             "description": description
         }
+        
+product_service = ProductService()
