@@ -27,7 +27,7 @@ class Prompt(BaseModel):
     def to_prompt(self) -> str:
         prompt = reduce(lambda prompt, msg: prompt + msg.to_query(), self.state, "")
         query = Message(role=RoleType.QUESTION, content=self.text)
-        prompt += query
+        prompt += query.to_query()
         return prompt
     
 class PromptResponse(BaseModel):
