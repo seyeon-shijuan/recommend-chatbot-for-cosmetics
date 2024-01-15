@@ -10,8 +10,6 @@ config = load()
 
 def randing():
     
-    prompt_state = []
-
     with st.sidebar:
         openai_api_key = st.text_input("OpenAI API Key", key="chatbot_api_key", type="password")
         "[Get an OpenAI API key](https://platform.openai.com/account/api-keys)"
@@ -62,43 +60,49 @@ def randing():
     conn.close()
 
     # Display chat messages from history on app rerun
-    for message in st.session_state.messages:
+    for message in st.session_state["messages"]:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
     # Accept user input
     if prompt := st.chat_input("말만 해요! 이 뽀야미가 해결해줄게요:)"):
+        
         # Add user message to chat history
-        st.session_state.messages.append({"role": "user", "content": prompt})
+        st.session_state["messages"].append({"role": "user", "content": prompt})
         # Display user message in chat message container
         with st.chat_message("user", avatar = '👩🏻'):
             st.markdown(prompt)
 
         # Display assistant response in chat message container
         with st.chat_message("assistant", avatar = '🧙‍♂️'):
-            full_response = ""
             
-            api_config = config["api"]
+            assistant_response = ""
             
-            chat_api_config = api_config["chat"]
-            recommend_api_config = api_config["recommend"]
-            
-            data = {
-                "state": prompt_state,
-                "text": prompt
-            }
-            response = requests.post(url=f"http://{chat_api_config['host']}:{chat_api_config['port']}/prompt", data=data)
-            
-            if response.status_code == 200:
-                json = response.json()
-                state = json["state"]
-                prompt_state.append(state[-1])
-                answer = json["answer"]
+            with st.spinner("답변을 기다리는 중입니다..."):
                 
-            else:
-                answer = "서비스 오류가 발생했습니다. 다시 시도해주세요."
-            
-            assistant_response = answer
+                api_config = config["api"]
+                
+                chat_api_config = api_config["chat"]
+                recommend_api_config = api_config["recommend"]
+                
+                data = {
+                    "state": st.session_state.prompt_state,
+                    "text": prompt
+                }
+                
+                response = requests.post(url=f"http://{chat_api_config['host']}:{chat_api_config['port']}/prompt", json=data)
+                
+                if response.status_code == 200:
+                    response_json = response.json()
+                    state = response_json["state"]
+                    answer = response_json["answer"]
+                    st.session_state.prompt_state.append(state[-1])
+                    st.session_state.prompt_state.append({"role":"ANSWER", "content":answer})
+                    
+                else:
+                    answer = "서비스 오류가 발생했습니다. 다시 시도해주세요."
+                
+                assistant_response = answer
 
             if "스킨케어 추천" in prompt:
                 #이미지 3개
@@ -133,16 +137,17 @@ def randing():
                 message_placeholder = st.empty()
 
                 # Simulate stream of response with milliseconds delay
+                full_response = ""
                 for chunk in assistant_response.split():
                     full_response += chunk + " "
-                    time.sleep(0.05)
+                    time.sleep(0.08)
                     # Add a blinking cursor to simulate typing
                     message_placeholder.markdown(full_response + "▌")
                     
                 message_placeholder.markdown(full_response)
 
             # Add assistant response to chat history
-            st.session_state.messages.append({"role":    "assistant", "content": full_response})
+            st.session_state["messages"].append({"role":    "assistant", "content": full_response})
             
             # 예1) response = requests.get(url="http://localhost:8080/test")
             # response_message = response.json()["response"]
@@ -151,6 +156,8 @@ def randing():
 # Initialize chat history
 if "messages" not in st.session_state:
     st.session_state.messages = []
+    st.session_state.prompt_state = []
+    
 
 randing()
 
