@@ -41,5 +41,5 @@ class PolyglotKo():
             pad_token_id=2,
         )
         tokenized_answer = self._tokenizer.decode(gened[0])
-        answer_text = tokenized_answer.split("### 답변: ")[-1].split("<|endoftext|>")[0]
-        return answer_text
+        answer = tokenized_answer.split("### 답변: ")[-1].split("<|endoftext|>")[0]
+        return answer
