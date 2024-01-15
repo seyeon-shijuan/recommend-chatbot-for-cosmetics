@@ -20,14 +20,17 @@ class Message(BaseModel):
 class Prompt(BaseModel):
     state: list[Message]
     text: str
+    
+    def __init__(self, **data):
+        super().__init__(**data)
+        query = Message(role=RoleType.QUESTION, content=self.text)
+        self.state.append(query)
         
     def get_messages(self) -> list[Message]:
         return self.state
     
     def to_prompt(self) -> str:
         prompt = reduce(lambda prompt, msg: prompt + msg.to_query(), self.state, "")
-        query = Message(role=RoleType.QUESTION, content=self.text)
-        prompt += query.to_query()
         return prompt
     
 class PromptResponse(BaseModel):
