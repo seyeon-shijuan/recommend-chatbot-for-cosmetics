@@ -140,8 +140,17 @@ class CollaborationFilter():
 
         # Usage example:
         new_user_id = 99999
-        new_anime_ratings = {204: 5, 506: 4, 393: 3}
-        new_matrix = self.add_new_user_ratings(new_user_id, new_anime_ratings)
+
+        # product_list를 id로 변환
+        new_cosme_ratings = dict()
+        for product in product_list:
+            selected_rows = self.cosmetics[self.cosmetics['brand'] == product]
+            if selected_rows.shape[0] > 0:
+                new_cosme_ratings[selected_rows['brand_id'].item()] = 5
+
+
+        # new_anime_ratings = {204: 5, 506: 4, 393: 3}
+        new_matrix = self.add_new_user_ratings(new_user_id, new_cosme_ratings)
 
         recommended = self.infer(rating_matrix=new_matrix, current_user=new_user_id)
 
