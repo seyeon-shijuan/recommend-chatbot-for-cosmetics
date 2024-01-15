@@ -7,9 +7,13 @@ setup(
     packages=[
         "src", 
         "src/api"
+        "src/pages"
     ],
     install_requires=[
-        "streamlit"
+        "streamlit",
+        "pandas",
+        "sqlite3",
+        "requests"
     ],
     entry_points={
         'console_scripts': [

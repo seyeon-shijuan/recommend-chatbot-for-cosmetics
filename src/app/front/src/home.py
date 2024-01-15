@@ -2,7 +2,6 @@
 import streamlit as st
 import random
 import time
-import pandas as pd
 import sqlite3
 import requests
 
