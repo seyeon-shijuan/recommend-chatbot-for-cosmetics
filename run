@@ -7,6 +7,9 @@ if [ $type = "chat" ]; then
 elif [ $type = "rec" ]; then
     cd ./src/app/recommend
     sh run
+elif [ $type = "front" ]; then
+    cd ./src/app/front
+    sh run
 else
-    echo "chat 또는 rec 만 입력해주세요"
+    echo "chat, rec 또는 front 만 입력해주세요"
 fi
