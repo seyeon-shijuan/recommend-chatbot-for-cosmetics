@@ -16,7 +16,9 @@ setup(
         "pydantic",
         "transformers",
         "peft",
-        "pytorch"
+        "pytorch",
+        "langchain",
+        "langchain_community"
     ],
     entry_points={
         'console_scripts': [
