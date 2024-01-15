@@ -1,8 +1,8 @@
 from transformers import AutoModelForCausalLM, pipeline, Pipeline
 from peft import PeftModel
-from src.model.llm.model_chain import ModelChain
+from src.model.llm.rag_chain import RAGChain
 
-class KoAlpaca(ModelChain):
+class KoAlpaca(RAGChain):
     
     def configure_pipeline() -> Pipeline:
         
@@ -28,23 +28,3 @@ class KoAlpaca(ModelChain):
         )
         
         return pipe
-        
-    # def ask(self, query: str) -> str:
-    #     q = f"{query}\n\n### 답변:"
-        
-    #     ans = self._pipe(
-    #         q + "\n\n### 답변:",
-    #         do_sample=True,
-    #         max_new_tokens=512,
-    #         temperature=0.7,
-    #         top_p=0.9,
-    #         return_full_text=False,
-    #         eos_token_id=2,
-    #     )
-        
-    #     answer = ans[0]["generated_text"]
-        
-    #     if "###" in answer:
-    #         answer = answer.split("###")[0]
-            
-    #     return answer
