@@ -137,7 +137,6 @@ def randing():
                 message_placeholder = st.empty()
 
                 # Simulate stream of response with milliseconds delay
-                full_response = ""
                 for chunk in assistant_response.split():
                     full_response += chunk + " "
                     time.sleep(0.08)
@@ -147,7 +146,7 @@ def randing():
                 message_placeholder.markdown(full_response)
 
             # Add assistant response to chat history
-            st.session_state["messages"].append({"role":    "assistant", "content": full_response})
+            st.session_state["messages"].append({"role":    "assistant", "content": assistant_response})
             
             # 예1) response = requests.get(url="http://localhost:8080/test")
             # response_message = response.json()["response"]
