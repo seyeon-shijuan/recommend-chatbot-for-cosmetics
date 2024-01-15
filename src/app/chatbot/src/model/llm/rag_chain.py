@@ -6,11 +6,15 @@ from langchain.chains import LLMChain
 from langchain.schema.runnable import RunnablePassthrough
 from langchain.chains.query_constructor.base import AttributeInfo
 from langchain_community.vectorstores import Chroma
+from fastapi.logger import logger
 
 class RAGChain(ModelChain):
     
     def __init__(self):
-        if super._config["RAG-Apply"]:
+        self._is_apply_rag = super._config["RAG-Apply"]
+        if self._is_apply_rag:
+            self._rag_model_name = super._config["RAG-Id"]
+            logger.info(f"RAG: {self._rag_model_name}")
             self._retriever = self._load_model()
         
     def _load_model(self):
@@ -29,7 +33,7 @@ class RAGChain(ModelChain):
     
     def ask(self, query: str) -> str:
         
-        if not super._config["RAG-Apply"]:
+        if not self._is_apply_rag:
             return super.ask(query=query)
         
         prompt_template = """

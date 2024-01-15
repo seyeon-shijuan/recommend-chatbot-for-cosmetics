@@ -5,6 +5,7 @@ from enum import Enum
 from functools import reduce
 from pydantic import BaseModel
 import configparser
+from fastapi.logger import logger
 
 class RoleType(Enum):
     QUESTION = "QUESTION"
@@ -47,6 +48,7 @@ class LLMServer():
         model_name = model_config["Model-Name"]
         
         self._model = None
+        logger.info(f"Model: {model_name}")
         if model_name == "PolyglotKo":
             self._model = PolyglotKo()
         elif model_name == "KoAlpaca":
