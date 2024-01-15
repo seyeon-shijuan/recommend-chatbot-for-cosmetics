@@ -17,8 +17,8 @@ def start():
 
 @app.get(path="/test")
 def test(text: str = "test"):
-    return chatbotAPIRouter.test(text)
+    return chatbotAPIRouter.test(text=text)
 
 @app.post(path="/prompt")
 async def prompt(prompt: Prompt) -> PromptResponse:
-    return chatbotAPIRouter.prompt(prompt)
+    return chatbotAPIRouter.prompt(prompt=prompt)

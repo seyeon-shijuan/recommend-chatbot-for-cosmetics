@@ -18,26 +18,22 @@ class Message(BaseModel):
         return f"### {self.role.value}: {self.content}\n\n"
         
 class Prompt(BaseModel):
-    messages: list[Message]
-        
-    def add_messages(self, role: RoleType, content: str):
-        self.messages.append(Message(role=role, content=content))    
+    state: list[Message]
+    text: str
         
     def get_messages(self) -> list[Message]:
-        return self.messages
+        return self.state
     
     def to_prompt(self) -> str:
-        prompt = reduce(lambda prompt, msg: prompt + msg.to_query(), self.messages, "")
+        prompt = reduce(lambda prompt, msg: prompt + msg.to_query(), self.state, "")
+        query = Message(role=RoleType.QUESTION, content=self.text)
+        prompt += query
         return prompt
     
 class PromptResponse(BaseModel):
     state: list[Message]
     answer: str
     
-    def __init__(self, state: list[Message], answer: str):
-        self.state = state
-        self.answer = answer
-        
 class LLMServer():
     
     def __init__(self):
@@ -57,7 +53,7 @@ class LLMServer():
         
         self._model.load_model()
             
-    def inference(self, prompt: Prompt):
+    def inference(self, prompt: Prompt) -> PromptResponse:
         
         query = prompt.to_prompt()
         answer = self._model.ask(query=query)
