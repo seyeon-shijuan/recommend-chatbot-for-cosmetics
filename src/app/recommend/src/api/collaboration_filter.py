@@ -1,3 +1,5 @@
+
+
 class CollaborationFilter():
     
     def get_filter_list(self, product_name) -> list[str]:
