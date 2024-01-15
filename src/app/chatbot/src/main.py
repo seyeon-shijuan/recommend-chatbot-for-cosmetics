@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from src.api.chat_api import chatbotAPIRouter
-from src.api.llm_serivce import Prompt
+from src.api.llm_serivce import Prompt, PromptResponse
 from uvicorn import run
 import configparser
 
@@ -20,7 +20,5 @@ def test(text: str = "test"):
     return chatbotAPIRouter.test(text)
 
 @app.post(path="/prompt")
-async def prompt(prompt: Prompt):
-    
-    print("POST", type(prompt))
+async def prompt(prompt: Prompt) -> PromptResponse:
     return chatbotAPIRouter.prompt(prompt)

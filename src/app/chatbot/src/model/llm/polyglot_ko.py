@@ -9,7 +9,7 @@ class PolyglotKo():
         config = configparser.ConfigParser()
         config.read("config.env")
         model_config = config["model"]
-        self.model_id = model_config["id"]
+        self.model_id = model_config["Id-Fine-Tuning"]
     
     def load_model(self):
         config = PeftConfig.from_pretrained(pretrained_model_name_or_path=self.model_id)
@@ -27,7 +27,7 @@ class PolyglotKo():
         self._model.eval()
         
     def ask(self, query: str) -> str:
-        q = f"{query}### 답변:"
+        q = f"{query}\n\n### 답변:"
         gened = self._model.generate(
             **self._tokenizer(
                 q, 
