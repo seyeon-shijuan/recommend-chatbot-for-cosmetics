@@ -3,7 +3,7 @@ import pandas as pd
 import sqlite3
 import plotly.express as px
 
-st.title("📈 설문조사데이터 분석보고서")
+st.header("📈 설문조사데이터 분석보고서")
 st.markdown("입력해주신 기본정보를 바탕으로 현재의 서비스 유저들의 피부고민과 인기상품을 한 눈에 확인할 수 있어요!")
 
 # SQLite 데이터베이스 연결

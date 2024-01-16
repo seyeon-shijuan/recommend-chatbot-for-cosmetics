@@ -1,11 +1,12 @@
 # 가영님
 import streamlit as st
-import random
 import time
 import sqlite3
 import requests
 import pandas as pd
 from config import load
+import json
+from streamlit_lottie import st_lottie
 
 config = load()
 
@@ -69,10 +70,14 @@ def randing():
 
     #제품사용이력 받아서 제품 추천
     st.markdown("<hr>", unsafe_allow_html=True) 
-    st.subheader("""제품추천""")
+    recommend = 'resource/data/recommend.json'
+    with open(recommend, "r") as file:
+        url = json.load(file)
+    st_lottie(url, reverse=True, height=300, width=300, speed=1, loop=True, quality='high')
+    st.subheader("""제품추천""") 
     st.markdown("""▶ 만족스럽게 사용했던 스킨케어 제품 3개를 선택해주세요.
                 \nℹ️브랜드명을 먼저 입력하면 쉽게 검색할 수 있어요!""") 
-
+     
     csv_file_path = 'resource/data/brand_ingredient_dataset.csv'
     df = pd.read_csv(csv_file_path)
     product = df['brand'].tolist()
@@ -82,9 +87,22 @@ def randing():
 
 
     st.markdown("<hr>", unsafe_allow_html=True)
+    chatbot_startanime = 'resource/data/chatbot_start.json'
+    with open(chatbot_startanime, "r") as file:
+        url = json.load(file)
+    st_lottie(url, reverse=True, height=200, width=200, speed=1, loop=True, quality='high')
     st.subheader("""챗봇""")
     st.markdown("""▶ 무엇이든 물어봐요! 당신만을 위한 챗봇서비스입니다.
                 \n🤩'스킨케어 추천'이라는 키워드와 함께 질문하면 추천상품소개를 바로 받아보실 수 있어요!""") 
+
+    # 타이머 추가
+    if "last_interaction_time" not in st.session_state:
+        st.session_state.last_interaction_time = time.time()
+
+    # Initialize chat history
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+        st.session_state.prompt_state = []
 
     # Display chat messages from history on app rerun
     for message in st.session_state["messages"]:
@@ -94,7 +112,7 @@ def randing():
 
     # Accept user input
     if prompt := st.chat_input("말만 해요! 이 뽀야미가 해결해줄게요:)"):
-        
+
         # Add user message to chat history
         st.session_state["messages"].append({"role": "user", "content": prompt})
         # Display user message in chat message container
@@ -102,10 +120,8 @@ def randing():
             st.markdown(prompt)
 
         # Display assistant response in chat message container
-        with st.chat_message("assistant", avatar = '🧙‍♂️'):
-            
+        with st.chat_message("assistant", avatar = '🧙‍♂️'): 
             assistant_response = ""
-            
             with st.spinner("답변을 기다리는 중입니다..."):
                 
                 api_config = config["api"]
@@ -170,10 +186,16 @@ def randing():
             # Add assistant response to chat history
             st.session_state["messages"].append({"role":    "assistant", "content": assistant_response})
 
-# Initialize chat history
-if "messages" not in st.session_state:
-    st.session_state.messages = []
-    st.session_state.prompt_state = []
-    
+    # 타이머 로직
+    if time.time() - st.session_state.last_interaction_time > 15:
+        st.info("15초가 초과되어 상담이 종료됐어요. 더 하고 싶은 이야기가 있으면 말해줘요!", timeout=10)
+        chatbot_endanime = 'resource/data/chatbot_end.json'
+        with open(chatbot_endanime, "r") as file:
+            url = json.load(file)
+        st_lottie(url, reverse=True, height=200, width=200, speed=1, loop=True, quality='high')        
+        st.experimental_rerun()
+    else:
+        st.session_state.last_interaction_time = time.time()
 
+    
 randing()
