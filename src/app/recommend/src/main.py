@@ -4,23 +4,16 @@ from uvicorn import run
 import configparser
 
 
-IF_PYCHARM = True
-
 app = FastAPI()
-config = configparser.ConfigParser()
 
-if IF_PYCHARM:
-    config.read("../config.env")
-else:
-    config.read("config.env")
+config = configparser.ConfigParser()
+config.read("config.env")
 
 server = config["server"]
 server_port = int(server["port"])
 
-
 def start():
     run(app, port=server_port)
-
 
 @app.get("/test")
 def test(text: str = "test"):
