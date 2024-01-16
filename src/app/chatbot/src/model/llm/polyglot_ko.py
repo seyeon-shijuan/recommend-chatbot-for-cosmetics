@@ -26,7 +26,7 @@ class PolyglotKo(RAGChain):
             task="text-generation",
             temperature=0.2,
             return_full_text=True,
-            max_new_tokens=1024,
+            max_new_tokens=512,
         )
         
         return pipe

@@ -15,9 +15,10 @@ class RAGChain(ModelChain):
         if self._is_apply_rag:
             self._rag_model_name = super._config["RAG-Id"]
             logger.info(f"RAG: {self._rag_model_name}")
-            self._retriever = self._load_model()
+            self._retriever = self._load_retriever()
+            self._rag_chain = self._load_rag_chain()
         
-    def _load_model(self):
+    def _load_retriever(self):
         model_name = super._config["RAG-Id"]
         encode_kwargs = {'normalize_embeddings': True}
         ko_embedding = HuggingFaceEmbeddings(
@@ -26,16 +27,13 @@ class RAGChain(ModelChain):
         )
 
         db = Chroma(persist_directory="resource/data/chroma_db", embedding_function=ko_embedding)
-        self._retriever = db.as_retriever(
+        _retriever = db.as_retriever(
             search_type="similarity",
             search_kwargs={'k': 3}
         )
+        return _retriever
     
-    def ask(self, query: str) -> str:
-        
-        if not self._is_apply_rag:
-            return super.ask(query=query)
-        
+    def _load_rag_chain(self):
         prompt_template = """
         ### [INST]
         Instruction: 화장품 정보와 화장품을 사용한 사용자의 리뷰입니다.
@@ -60,12 +58,18 @@ class RAGChain(ModelChain):
         
         llm_chain = LLMChain(llm=llm, prompt=prompt)
         
-        rag_chain = (
+        _rag_chain = (
         {"context": self._retriever, "question": RunnablePassthrough()}
             | llm_chain
         )
-            
-        result = rag_chain.invoke(query)    
+        return _rag_chain
+
+    def ask(self, query: str) -> str:
+        
+        if not self._is_apply_rag:
+            return super.ask(query=query)
+
+        result = self._rag_chain.invoke(query)    
         answer = result['text']
         
         return answer

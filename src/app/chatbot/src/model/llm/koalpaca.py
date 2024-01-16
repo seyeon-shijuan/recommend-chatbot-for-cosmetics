@@ -4,10 +4,10 @@ from src.model.llm.rag_chain import RAGChain
 
 class KoAlpaca(RAGChain):
     
-    def configure_pipeline() -> Pipeline:
+    def configure_pipeline(self) -> Pipeline:
         
-        model_id = super._config["Id-DPO"]
-        based_model_id = super._config["Id-DPO-based"]
+        model_id = self._config["Id-DPO"]
+        based_model_id = self._config["Id-DPO-based"]
         
         base_model = AutoModelForCausalLM.from_pretrained(
             pretrained_model_name_or_path=based_model_id,
