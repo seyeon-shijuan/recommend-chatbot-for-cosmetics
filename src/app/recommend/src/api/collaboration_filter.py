@@ -136,7 +136,20 @@ class CollaborationFilter():
 
         return anime_information  # items
 
-    def get_filter_list(self, product_name) -> list[str]:
+    def parse_dataframe(self, df):
+        product_list = []
+
+        for index, row in df.iterrows():
+            product_info = {
+                "id": row['brand_id'],
+                "name": row['brand']
+            }
+            product_list.append(product_info)
+
+        result = product_list
+        return result
+
+    def get_filter_list(self, product_name) -> list:
         '''추천 리스트 반환 api'''
         product_list = product_name.split(',')
 
@@ -157,13 +170,7 @@ class CollaborationFilter():
 
         recommended = self.infer(rating_matrix=new_matrix, current_user=new_user_id)
 
-        # for col, ser in recommended.iteritems():
-        #     print(ser)
-
-        # to_recommend = recommended[['brand_id', 'brand']].to_tuple
-        to_recommend = list(recommended[['brand_id', 'brand']].itertuples(index=False))
-        # to_recommend = recommended['brand'].to_list()
-
+        to_recommend = self.parse_dataframe(recommended)
         return to_recommend
 
 
