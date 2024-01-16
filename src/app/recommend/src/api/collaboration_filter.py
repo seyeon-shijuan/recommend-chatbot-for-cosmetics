@@ -70,14 +70,15 @@ class CollaborationFilter():
 
     def infer(self, rating_matrix, current_user=226):
         # try it out
-        similar_user_indices = self.similar_users(current_user, rating_matrix)
-        print(f"{similar_user_indices=}")
-
-        # try it out
+        # similar_user_indices = self.similar_users(current_user, rating_matrix)
+        top_users_similarities = self.similar_users(current_user, rating_matrix)
+        print(f"{top_users_similarities=}")
+        similar_user_indices = [u[0] for u in top_users_similarities]
+        # top K(5명) 번호
         recommended = self.recommend_item(current_user, similar_user_indices, rating_matrix)
         return recommended
 
-    def similar_users(self, user_id, matrix, k=3):
+    def similar_users(self, user_id, matrix, k=5):
         # create a df of just the current user
         user = matrix[matrix.index == user_id]
 
@@ -99,9 +100,9 @@ class CollaborationFilter():
 
         # grab k users off the top
         top_users_similarities = index_similarity_sorted[:k]
-        users = [u[0] for u in top_users_similarities]
+        # users = [u[0] for u in top_users_similarities]
 
-        return users
+        return top_users_similarities
 
     def recommend_item(self, user_index, similar_user_indices, matrix, items=3):
         # load vectors for similar users
@@ -136,6 +137,7 @@ class CollaborationFilter():
         return anime_information  # items
 
     def get_filter_list(self, product_name) -> list[str]:
+        '''추천 리스트 반환 api'''
         product_list = product_name.split(',')
 
         # Usage example:
@@ -144,6 +146,7 @@ class CollaborationFilter():
         # product_list를 id로 변환
         new_cosme_ratings = dict()
         for product in product_list:
+            product = product.strip()
             selected_rows = self.cosmetics[self.cosmetics['brand'] == product]
             if selected_rows.shape[0] > 0:
                 new_cosme_ratings[selected_rows['brand_id'].item()] = 5
@@ -154,7 +157,12 @@ class CollaborationFilter():
 
         recommended = self.infer(rating_matrix=new_matrix, current_user=new_user_id)
 
-        to_recommend = recommended['brand'].to_list()
+        # for col, ser in recommended.iteritems():
+        #     print(ser)
+
+        # to_recommend = recommended[['brand_id', 'brand']].to_tuple
+        to_recommend = list(recommended[['brand_id', 'brand']].itertuples(index=False))
+        # to_recommend = recommended['brand'].to_list()
 
         return to_recommend
 
