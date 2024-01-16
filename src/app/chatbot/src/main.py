@@ -3,6 +3,9 @@ from src.api.chat_api import chatbotAPIRouter
 from src.api.llm_serivce import Prompt, PromptResponse
 from uvicorn import run
 import configparser
+import warnings
+
+warnings.filterwarnings('ignore')
 
 app = FastAPI()
 

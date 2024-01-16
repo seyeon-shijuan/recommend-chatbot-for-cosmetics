@@ -11,7 +11,7 @@ class RecommendationAPIRouter:
     def __init__(self, collabo_filter: CollaborationFilter, product_service: ProductService):
         self.collabo_filter = collabo_filter
         self.product_service = product_service
-        
+
     def test(self, text):
         return {
             "test": text

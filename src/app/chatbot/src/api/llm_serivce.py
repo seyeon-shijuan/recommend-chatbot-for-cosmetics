@@ -1,10 +1,11 @@
 import configparser
 from src.model.llm.polyglot_ko import PolyglotKo
-from src.model.llm.sakura import Sakura
+from src.model.llm.koalpaca import KoAlpaca
 from enum import Enum
 from functools import reduce
 from pydantic import BaseModel
 import configparser
+from fastapi.logger import logger
 
 class RoleType(Enum):
     QUESTION = "QUESTION"
@@ -47,10 +48,11 @@ class LLMServer():
         model_name = model_config["Model-Name"]
         
         self._model = None
+        logger.info(f"Model: {model_name}")
         if model_name == "PolyglotKo":
             self._model = PolyglotKo()
-        elif model_name == "Sakura":
-            self._model = Sakura()
+        elif model_name == "KoAlpaca":
+            self._model = KoAlpaca()
         else:
             raise ValueError(f"모델 이름이 유효하지 않습니다.({model_name})")
         
