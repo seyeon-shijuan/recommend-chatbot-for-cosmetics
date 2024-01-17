@@ -13,8 +13,8 @@ class Product:
     image_url: str
     
 class RoleType(Enum):
-    QUESTION = "QUESTION"
-    ANSWER = "ANSWER"
+    QUESTION = "질문"
+    ANSWER = "답변"
     
 class Message(BaseModel):
     role: RoleType
