@@ -8,13 +8,42 @@ from config import load
 import json
 from streamlit_lottie import st_lottie
 
-config = load()
-
 # Initialize chat history
 if "messages" not in st.session_state:
     st.session_state.messages = []
     st.session_state.prompt_state = []
+<<<<<<< HEAD
     st.session_state.image_messages = []
+=======
+
+config = load()
+api_config = config["api"]
+chat_api_config = api_config["chat"]
+recommend_api_config = api_config["recommend"]
+
+def request_chat(text: str, product_names: list[str] = []) -> tuple[str, dict]:
+    
+    data = {
+        "state": st.session_state.prompt_state,
+        "text": text,
+        "product_list": product_names
+    }
+    
+    response = requests.post(url=f"http://{chat_api_config['host']}:{chat_api_config['port']}/prompt", json=data)
+                
+    if response.status_code == 200:
+        response_json = response.json()
+        state = response_json["state"]
+        answer = response_json["answer"]
+        product_list = response_json["product_list"]
+        if not product_list:
+            st.session_state.prompt_state.append(state[-1])
+            st.session_state.prompt_state.append({"role":"답변", "content":answer})
+        
+        return answer, product_list
+    else:
+        return "서비스 오류가 발생했습니다. 다시 시도해주세요.", []
+>>>>>>> 0cf251e2c08e460ee323c122cfe58936bb6de745
 
 def randing():
     
@@ -172,8 +201,6 @@ def randing():
                     "state": st.session_state.prompt_state,
                     "text": prompt
                 }
-                
-                assistant_response = "답변"
 
                 # response = requests.post(url=f"http://{chat_api_config['host']}:{chat_api_config['port']}/prompt", json=data)
                 
@@ -186,6 +213,7 @@ def randing():
                     
                 # else:
                 #     answer = "서비스 오류가 발생했습니다. 다시 시도해주세요."
+                assistant_response = "답변"
 
 
             if "스킨케어 추천" in prompt:
