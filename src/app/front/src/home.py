@@ -14,7 +14,7 @@ config = load()
 if "messages" not in st.session_state:
     st.session_state.messages = []
     st.session_state.prompt_state = []
-
+    st.session_state.image_messages = []
 
 def randing():
     
@@ -90,6 +90,48 @@ def randing():
     product_list = list(set(product))
     
     selected_products = st.multiselect('', product_list, placeholder = 'ex) 구달 맑은 어성초 진정 수분 토너')
+    if st.button('추천받기'):
+        #협업 필터링으로 추천상품 반환. 데이터 형태는 아래처럼 짰음
+        rec_product = [
+                    {"image_url": "https://image.oliveyoung.co.kr/uploads/images/goods/550/10/0000/0019/A00000019835702ko.jpg?l=ko",
+                    'product_info': {"link_url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000198357&dispCatNo=90000010009&trackingCd=Best_Sellingbest&t_page=%EB%9E%AD%ED%82%B9&t_click=%ED%8C%90%EB%A7%A4%EB%9E%AD%ED%82%B9_%EC%8A%A4%ED%82%A8%EC%BC%80%EC%96%B4_%EC%83%81%ED%92%88%EC%83%81%EC%84%B8&t_number=10",
+                                    "caption": "라로슈포제 시카플라스트 밤"}},
+                    {"image_url": "https://image.oliveyoung.co.kr/uploads/images/goods/550/10/0000/0017/A00000017131219ko.jpg?l=ko",
+                    'product_info': {"link_url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000171312&dispCatNo=90000010009&trackingCd=Best_Sellingbest&t_page=%EB%9E%AD%ED%82%B9&t_click=%ED%8C%90%EB%A7%A4%EB%9E%AD%ED%82%B9_%EC%8A%A4%ED%82%A8%EC%BC%80%EC%96%B4_%EC%83%81%ED%92%88%EC%83%81%EC%84%B8&t_number=22",
+                                    "caption": "달바 화이트 트러플 퍼스트 스프레이 세럼 100ml"}},
+                    {"image_url": "https://image.oliveyoung.co.kr/uploads/images/goods/550/10/0000/0019/A00000019067724ko.jpg?l=ko",
+                    'product_info': {"link_url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000190677&dispCatNo=90000010009&trackingCd=Best_Sellingbest&t_page=%EB%9E%AD%ED%82%B9&t_click=%ED%8C%90%EB%A7%A4%EB%9E%AD%ED%82%B9_%EC%8A%A4%ED%82%A8%EC%BC%80%EC%96%B4_%EC%83%81%ED%92%88%EC%83%81%EC%84%B8&t_number=27",
+                                    "caption": "토리든 다이브인 저분자 히알루론산 수딩 크림 100ml"}}
+                ]
+
+        expander_columns = st.columns(len(rec_product))
+
+        for index, (image_info, expander_column) in enumerate(zip(rec_product, expander_columns)):
+            image_with_link = f'<a href="{image_info["product_info"]["link_url"]}" target="_blank"><img src="{image_info["image_url"]}" width="200"></a>'
+
+            with expander_column:
+                with st.expander(f"{image_info['product_info']['caption']}"):
+                    st.markdown(image_with_link, unsafe_allow_html=True)
+                    # 각 상품에 대한 추천 이유를 담은 답변 창 추가
+                    explanation = st.text_area(f"상품 {index + 1}에 대한 추천 이유", f"이 상품은 {image_info['product_info']['caption']}의 특징 때문에 추천합니다.")
+
+        # explanations = []
+
+        # for index, image_info in enumerate(rec_product):
+        #     image_with_link = f'<a href="{image_info["product_info"]["link_url"]}" target="_blank"><img src="{image_info["image_url"]}" width="200"></a>'
+            
+        #     with st.expander(f"{image_info['product_info']['caption']}"):
+        #         st.markdown(image_with_link, unsafe_allow_html=True)
+                
+        #         # 각 상품에 대한 추천 이유를 담은 답변 창 추가. 답변 받아오는 것 추가 필요
+        #         explanation = st.text_area("추천 이유", f"이 상품은 {image_info['product_info']['caption']}의 특징 때문에 추천합니다.")
+        #         explanations.append(explanation)
+
+        # #Expand 창 생성
+        # for image_info in rec_product:
+        #     image_with_link = f'<a href="{image_info["product_info"]["link_url"]}" target="_blank"><img src="{image_info["image_url"]}" width="200"></a>'
+        #     with st.expander(f"{image_info['product_info']['caption']}"):
+        #         st.markdown(image_with_link, unsafe_allow_html=True)
 
 
     st.markdown("<hr>", unsafe_allow_html=True)
@@ -100,14 +142,6 @@ def randing():
     st.subheader("""챗봇""")
     st.markdown("""▶ 무엇이든 물어봐요! 당신만을 위한 챗봇서비스입니다.
                 \n🤩'스킨케어 추천'이라는 키워드와 함께 질문하면 추천상품소개를 바로 받아보실 수 있어요!""") 
-
-    # 타이머 추가
-    if "last_interaction_time" not in st.session_state:
-        st.session_state.last_interaction_time = time.time()
-
-    # 채팅 종료 메시지를 보여줄지 여부를 결정하는 변수
-    if "show_chat_end_message" not in st.session_state:
-        st.session_state.show_chat_end_message = False
 
     # Display chat messages from history on app rerun
     for message in st.session_state["messages"]:
@@ -139,6 +173,8 @@ def randing():
                     "text": prompt
                 }
                 
+                assistant_response = "답변"
+
                 # response = requests.post(url=f"http://{chat_api_config['host']}:{chat_api_config['port']}/prompt", json=data)
                 
                 # if response.status_code == 200:
@@ -150,8 +186,6 @@ def randing():
                     
                 # else:
                 #     answer = "서비스 오류가 발생했습니다. 다시 시도해주세요."
-                
-                assistant_response = "답변"
 
 
             if "스킨케어 추천" in prompt:
@@ -168,53 +202,37 @@ def randing():
                                     "caption": "토리든 다이브인 저분자 히알루론산 수딩 크림 100ml"}}
                 ]
                 
-                # #Expand 창 생성
-                # for image_info in rec_product:
-                #     image_with_link = f'<a href="{image_info["product_info"]["link_url"]}" target="_blank"><img src="{image_info["image_url"]}" width="200"></a>'
-                #     with st.expander(f"{image_info['product_info']['caption']}"):
-                #         st.markdown(image_with_link, unsafe_allow_html=True)
+                # 이미지를 채팅 메세지로 추가
+                for product in rec_product:
+                    st.session_state.image_messages.append({"role": "assistant", "content": product, "avatar": "🧙‍♂️"})
 
                 # 채팅컨테이너 내 이미지 나오게
-                with st.container():
-                    for product in rec_product:
-                        image_html = f'<a href="{product["product_info"]["link_url"]}" target="_blank"><img src="{product["image_url"]}" width="200" /></a>'
-                        product_info = f"**{product['product_info']['caption']}**" 
-                        st.image(product["image_url"], width=200)
-                        st.write(product_info)
-                    # #with st.chat_message("assistant", avatar = '🧙‍♂️'): # unsafe_allow_html=True
-                    # image_html, product_info
-                    # message_placeholder = st.empty()
-                    # message_placeholder.markdown(image_html)
-                    
+                if st.session_state.image_messages:
+                    for message in st.session_state.image_messages:
+                        if message["role"] == "assistant" and "content" in message and isinstance(message["content"], dict):
+                            with st.container():
+                                image_html = f'<a href="{message["content"]["product_info"]["link_url"]}" target="_blank"><img src="{message["content"]["image_url"]}" width="200" /></a>'
+                                product_info = f"**{message['content']['product_info']['caption']}**"
+                                st.image(message["content"]["image_url"], width=200)
+                                st.write(product_info)
+                                st.empty()
+                        
 
-            else:
+                else:
+                    # Display assistant response in chat message container
+                    message_placeholder = st.empty()
 
-                # Display assistant response in chat message container
-                message_placeholder = st.empty()
+                    # Simulate stream of response with milliseconds delay
+                    full_response = ""
+                    for chunk in assistant_response.split():
+                        full_response += chunk + " "
+                        time.sleep(0.08)
+                        # Add a blinking cursor to simulate typing
+                        message_placeholder.markdown(full_response + "▌")
+                        
+                    message_placeholder.markdown(full_response)
 
-                # Simulate stream of response with milliseconds delay
-                full_response = ""
-                for chunk in assistant_response.split():
-                    full_response += chunk + " "
-                    time.sleep(0.08)
-                    # Add a blinking cursor to simulate typing
-                    message_placeholder.markdown(full_response + "▌")
-                    
-                message_placeholder.markdown(full_response)
-
-            # Add assistant response to chat history
-            st.session_state["messages"].append({"role":    "assistant", "content": assistant_response})
-
-    # 타이머 로직
-    if time.time() - st.session_state.last_interaction_time > 15:
-        st.info("15초가 초과되어 상담이 종료됐어요. 더 하고 싶은 이야기가 있으면 말해줘요!", timeout=10)
-        chatbot_endanime = 'resource/data/chatbot_end.json'
-        with open(chatbot_endanime, "r") as file:
-            url = json.load(file)
-        st_lottie(url, reverse=True, height=200, width=200, speed=1, loop=True, quality='high')        
-        st.experimental_rerun()
-    else:
-        st.session_state.last_interaction_time = time.time()
-
+                # Add assistant response to chat history
+                st.session_state["messages"].append({"role":    "assistant", "content": assistant_response})
     
 randing()
