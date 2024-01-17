@@ -10,6 +10,12 @@ from streamlit_lottie import st_lottie
 
 config = load()
 
+# Initialize chat history
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+    st.session_state.prompt_state = []
+
+
 def randing():
     
     st.header("✨깨끗하게 맑게 자신있게!✨")
@@ -103,11 +109,6 @@ def randing():
     if "show_chat_end_message" not in st.session_state:
         st.session_state.show_chat_end_message = False
 
-    # Initialize chat history
-    if "messages" not in st.session_state:
-        st.session_state.messages = []
-        st.session_state.prompt_state = []
-
     # Display chat messages from history on app rerun
     for message in st.session_state["messages"]:
         avatar = '👩🏻' if message["role"] == "user" else '🧙‍♂️'
@@ -138,40 +139,54 @@ def randing():
                     "text": prompt
                 }
                 
-                response = requests.post(url=f"http://{chat_api_config['host']}:{chat_api_config['port']}/prompt", json=data)
+                # response = requests.post(url=f"http://{chat_api_config['host']}:{chat_api_config['port']}/prompt", json=data)
                 
-                if response.status_code == 200:
-                    response_json = response.json()
-                    state = response_json["state"]
-                    answer = response_json["answer"]
-                    st.session_state.prompt_state.append(state[-1])
-                    st.session_state.prompt_state.append({"role":"답변", "content":answer})
+                # if response.status_code == 200:
+                #     response_json = response.json()
+                #     state = response_json["state"]
+                #     answer = response_json["answer"]
+                #     st.session_state.prompt_state.append(state[-1])
+                #     st.session_state.prompt_state.append({"role":"ANSWER", "content":answer})
                     
-                else:
-                    answer = "서비스 오류가 발생했습니다. 다시 시도해주세요."
+                # else:
+                #     answer = "서비스 오류가 발생했습니다. 다시 시도해주세요."
                 
-                assistant_response = answer
+                assistant_response = "답변"
+
 
             if "스킨케어 추천" in prompt:
                 #이미지 3개
-                bot_response_images = [
+                rec_product = [
                     {"image_url": "https://image.oliveyoung.co.kr/uploads/images/goods/550/10/0000/0019/A00000019835702ko.jpg?l=ko",
-                        "link_url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000198357&dispCatNo=90000010009&trackingCd=Best_Sellingbest&t_page=%EB%9E%AD%ED%82%B9&t_click=%ED%8C%90%EB%A7%A4%EB%9E%AD%ED%82%B9_%EC%8A%A4%ED%82%A8%EC%BC%80%EC%96%B4_%EC%83%81%ED%92%88%EC%83%81%EC%84%B8&t_number=10", 
-                        "caption": "라로슈포제 시카플라스트 밤"},
+                    'product_info': {"link_url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000198357&dispCatNo=90000010009&trackingCd=Best_Sellingbest&t_page=%EB%9E%AD%ED%82%B9&t_click=%ED%8C%90%EB%A7%A4%EB%9E%AD%ED%82%B9_%EC%8A%A4%ED%82%A8%EC%BC%80%EC%96%B4_%EC%83%81%ED%92%88%EC%83%81%EC%84%B8&t_number=10",
+                                    "caption": "라로슈포제 시카플라스트 밤"}},
                     {"image_url": "https://image.oliveyoung.co.kr/uploads/images/goods/550/10/0000/0017/A00000017131219ko.jpg?l=ko",
-                        "link_url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000171312&dispCatNo=90000010009&trackingCd=Best_Sellingbest&t_page=%EB%9E%AD%ED%82%B9&t_click=%ED%8C%90%EB%A7%A4%EB%9E%AD%ED%82%B9_%EC%8A%A4%ED%82%A8%EC%BC%80%EC%96%B4_%EC%83%81%ED%92%88%EC%83%81%EC%84%B8&t_number=22", 
-                        "caption": "달바 화이트 트러플 퍼스트 스프레이 세럼 100ml"},
+                    'product_info': {"link_url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000171312&dispCatNo=90000010009&trackingCd=Best_Sellingbest&t_page=%EB%9E%AD%ED%82%B9&t_click=%ED%8C%90%EB%A7%A4%EB%9E%AD%ED%82%B9_%EC%8A%A4%ED%82%A8%EC%BC%80%EC%96%B4_%EC%83%81%ED%92%88%EC%83%81%EC%84%B8&t_number=22",
+                                    "caption": "달바 화이트 트러플 퍼스트 스프레이 세럼 100ml"}},
                     {"image_url": "https://image.oliveyoung.co.kr/uploads/images/goods/550/10/0000/0019/A00000019067724ko.jpg?l=ko",
-                        "link_url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000190677&dispCatNo=90000010009&trackingCd=Best_Sellingbest&t_page=%EB%9E%AD%ED%82%B9&t_click=%ED%8C%90%EB%A7%A4%EB%9E%AD%ED%82%B9_%EC%8A%A4%ED%82%A8%EC%BC%80%EC%96%B4_%EC%83%81%ED%92%88%EC%83%81%EC%84%B8&t_number=27", 
-                        "caption": "토리든 다이브인 저분자 히알루론산 수딩 크림 100ml"} 
-                    ]
+                    'product_info': {"link_url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000190677&dispCatNo=90000010009&trackingCd=Best_Sellingbest&t_page=%EB%9E%AD%ED%82%B9&t_click=%ED%8C%90%EB%A7%A4%EB%9E%AD%ED%82%B9_%EC%8A%A4%ED%82%A8%EC%BC%80%EC%96%B4_%EC%83%81%ED%92%88%EC%83%81%EC%84%B8&t_number=27",
+                                    "caption": "토리든 다이브인 저분자 히알루론산 수딩 크림 100ml"}}
+                ]
                 
-                #Expand 창 생성
-                for image_info in bot_response_images:
-                    image_with_link = f'<a href="{image_info["link_url"]}" target="_blank"><img src="{image_info["image_url"]}" width="200"></a>'
-                    with st.expander(f"{image_info['caption']}"):
-                        st.markdown(image_with_link, unsafe_allow_html=True)
-            
+                # #Expand 창 생성
+                # for image_info in rec_product:
+                #     image_with_link = f'<a href="{image_info["product_info"]["link_url"]}" target="_blank"><img src="{image_info["image_url"]}" width="200"></a>'
+                #     with st.expander(f"{image_info['product_info']['caption']}"):
+                #         st.markdown(image_with_link, unsafe_allow_html=True)
+
+                # 채팅컨테이너 내 이미지 나오게
+                with st.container():
+                    for product in rec_product:
+                        image_html = f'<a href="{product["product_info"]["link_url"]}" target="_blank"><img src="{product["image_url"]}" width="200" /></a>'
+                        product_info = f"**{product['product_info']['caption']}**" 
+                        st.image(product["image_url"], width=200)
+                        st.write(product_info)
+                    # #with st.chat_message("assistant", avatar = '🧙‍♂️'): # unsafe_allow_html=True
+                    # image_html, product_info
+                    # message_placeholder = st.empty()
+                    # message_placeholder.markdown(image_html)
+                    
+
             else:
 
                 # Display assistant response in chat message container
