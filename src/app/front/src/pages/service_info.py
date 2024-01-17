@@ -1,6 +1,6 @@
 import streamlit as st
 
-st.title("🔠 서비스소개")
+st.header("🔠 서비스소개")
 
 st.markdown(
     """

@@ -56,7 +56,7 @@ class LLMServer():
         else:
             raise ValueError(f"모델 이름이 유효하지 않습니다.({model_name})")
         
-        self._model.load_model()
+        self._model._load_model()
             
     def inference(self, prompt: Prompt) -> PromptResponse:
         
