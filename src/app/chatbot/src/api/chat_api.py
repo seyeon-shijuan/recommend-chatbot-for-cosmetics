@@ -1,4 +1,8 @@
-from src.api.llm_serivce import llm_service, Prompt
+from src.api.llm_serivce import llm_service
+from src.api.request import Prompt
+import logging
+
+logger = logging.getLogger(__name__)
 
 class Request():
     
@@ -16,6 +20,7 @@ class ChatbotAPIRouter:
         self._llm_service = llm_service
         
     def test(self, text):
+        logger.debug("sdf")
         return {
             "test": text
         }

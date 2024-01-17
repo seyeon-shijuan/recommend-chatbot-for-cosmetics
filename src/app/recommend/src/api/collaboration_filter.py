@@ -2,12 +2,16 @@ import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
 import operator
 
+
 class CollaborationFilter():
-    def __init__(self):
-        cosmetics = pd.read_csv('resource/data/collabo_filtering_dataset.csv')
-        self.cosmetics = cosmetics.drop_duplicates(subset='brand_id')
+    
+    def __init__(self, filepath):
+        self.original_cosmetics = pd.read_csv(filepath)
+        self.distinct_cosmetics = self.original_cosmetics.drop_duplicates(subset="brand_id", keep="first")
+        self.ingredient_dataset = pd.read_csv('resource/data/mapped_ingredient_dataset.csv')
+        self.cosmetics = self.original_cosmetics.drop_duplicates(subset='brand_id')
         rating_matrix = self.cosmetics.pivot_table(index='user_id', columns='brand_id', values='rate')
-        
+
         # replace NaN values with 0
         self.rating_matrix = rating_matrix.fillna(0)
 
@@ -34,13 +38,33 @@ class CollaborationFilter():
         print(f"New user {user_id} added to the rating matrix.")
         return new_rating_matrix
 
+    def get_most_famous_product_by_skin_type(self):
+        df = self.original_cosmetics
+        famous_products_df = pd.DataFrame(columns=df.columns)
+
+        # 'skin_type'이 '지성에 좋아요'인 행 필터링
+        filtered_df = df[df['skin_type'] == self.skin_type]
+
+        # 'brand'를 기준으로 group by
+        grouped_df = filtered_df.groupby('brand').size().reset_index(name='count')
+        grouped_df = grouped_df.sort_values(by='count', ascending=False)
+        selected = grouped_df[:3]
+
+        for item in selected['brand'].tolist():
+            to_add = df.loc[df['brand'] == item].iloc[0, :].to_frame().T
+            famous_products_df = pd.concat([famous_products_df, to_add], axis=0, ignore_index=True)
+
+        return famous_products_df
+
     def infer(self, rating_matrix, current_user=226):
         top_users_similarities = self.similar_users(current_user, rating_matrix)
         print(f"{top_users_similarities=}")
         similar_user_indices = [u[0] for u in top_users_similarities]
-        
+
+        self.candidates = self.get_most_famous_product_by_skin_type()
         # top K(5명) 번호
-        recommended = self.recommend_item(current_user, similar_user_indices, rating_matrix)
+        recommended = self.recommend_item(current_user, similar_user_indices, rating_matrix, self.candidates)
+
         return recommended
 
     def similar_users(self, user_id, matrix, k=5):
@@ -58,9 +82,10 @@ class CollaborationFilter():
 
         # create key/values pairs of user index and their similarity
         index_similarity = dict(zip(indices, similarities))
-        
+
         # filter out entries with similarity equal to 0.0
-        filtered_index_similarity = {index: similarity for index, similarity in index_similarity.items() if similarity != 0.0}
+        filtered_index_similarity = {index: similarity for index, similarity in index_similarity.items() if
+                                     similarity != 0.0}
 
         # sort by similarity
         index_similarity_sorted = sorted(filtered_index_similarity.items(), key=operator.itemgetter(1))
@@ -68,10 +93,11 @@ class CollaborationFilter():
 
         # grab k users off the top
         top_users_similarities = index_similarity_sorted[:k]
-        
+
+
         return top_users_similarities
 
-    def recommend_item(self, user_index, similar_user_indices, matrix, items=3):
+    def recommend_item(self, user_index, similar_user_indices, matrix, candidates=None, items=3):
         # load vectors for similar users
         similar_users = matrix[matrix.index.isin(similar_user_indices)]
         # calc avg ratings across the 3 similar users
@@ -80,27 +106,55 @@ class CollaborationFilter():
         similar_users_df = pd.DataFrame(similar_users, columns=['mean'])
 
         # load vector for the current user
-        #user_df = matrix[matrix.index == user_index]
+        user_df = matrix[matrix.index == user_index]
         # transpose it so its easier to filter
-        #user_df_transposed = user_df.transpose()
+        user_df_transposed = user_df.transpose()
         # rename the column as 'rating'
-        #user_df_transposed.columns = ['rate']
+        user_df_transposed.columns = ['rate']
         # remove any rows without a 0 value. Anime not watched yet
-        #user_df_transposed = user_df_transposed[user_df_transposed['rate'] == 0]
+        user_df_transposed = user_df_transposed[user_df_transposed['rate'] == 0]
         # generate a list of animes the user has not seen
-        #animes_unseen = user_df_transposed.index.tolist()
+        animes_unseen = user_df_transposed.index.tolist()
         # filter avg ratings of similar users for only anime the current user has not seen
-        #similar_users_df_filtered = similar_users_df[similar_users_df.index.isin(animes_unseen)]
-        
+        similar_users_df_filtered = similar_users_df[similar_users_df.index.isin(animes_unseen)]
+
         # order the dataframe
-        similar_users_df_ordered = similar_users_df.sort_values(by=['mean'], ascending=False)
-        
+        similar_users_df_ordered = similar_users_df_filtered.sort_values(by=['mean'], ascending=False)
+        similar_users_df_ordered = similar_users_df_ordered[similar_users_df_ordered['mean'] != 0]
+
+        # 0인것 제거한 후 row개수가 3개 미만인경우 추가
+        # similar_users_df_ordered = similar_users_df_ordered[similar_users_df_ordered['mean'] !=0]
+        # if len(similar_users_df_ordered) < 3:
+
+        # brand_df = self.cosmetics[['brand', 'rate']]
+        # brand_group_df = brand_df.groupby(by="brand")
+
+        # 'brand' 및 'skin_type'으로 그룹화하고 최빈값 찾기
+        # result = self.original_cosmetics.groupby(['brand', 'skin_type']).size().reset_index(name='count')
+        # idx = result.groupby('brand')['count'].idxmax()
+        # most_common_skin_type = result.loc[idx, ['brand', 'skin_type']]
+        # most_common_skin_type = most_common_skin_type.drop_duplicates(subset=['brand', 'skin_type'])
+
+        # first_brand_id = similar_users_df_ordered.iloc[0, 0]
+        # first_skin_type = self.original_cosmetics[self.original_cosmetics['brand'] == first_brand_id]['skin_type']
+
+        # brand_df = self.original_cosmetics.groupby('brand')[''].max()
+
+        # print(most_common_skin_type)
+
+        # max_item = self.cosmetics[['brand', 'rate']].value_counts().head(10)
+
         # grab the top n brand
         top_n_brand = similar_users_df_ordered.head(items)
         top_n_brand_indices = top_n_brand.index.tolist()
-        
+
         # lookup these anime in the other dataframe to find names
         brand_information = self.cosmetics[self.cosmetics['brand_id'].isin(top_n_brand_indices)]
+
+        n_brand_information = len(brand_information)
+        if n_brand_information < items:
+            to_append = candidates[:items - n_brand_information]
+            brand_information = pd.concat([brand_information, to_append])
 
         return brand_information  # items
 
@@ -117,15 +171,18 @@ class CollaborationFilter():
         result = product_list
         return result
 
-    def get_filter_list(self, product_name) -> list[str]:
+    def set_my_skintype(self, product_list):
+        filtered_df = self.original_cosmetics[self.original_cosmetics['brand'].isin(product_list)]
+        most_common_skin_type = filtered_df['skin_type'].mode().iloc[0]
+        self.skin_type = most_common_skin_type
+        print(f"{self.skin_type=}")
 
+    def get_filter_list(self, product_name) -> list:
         '''추천 리스트 반환 api'''
+        product_list = product_name.split(', ')
+        self.set_my_skintype(product_list)
 
-        product_list = product_name.split(',')
-
-        # Usage example:
         new_user_id = 99999
-        print(len(self.rating_matrix))
 
         # product_list를 id로 변환
         new_cosme_ratings = dict()
@@ -135,16 +192,62 @@ class CollaborationFilter():
             if selected_rows.shape[0] > 0:
                 new_cosme_ratings[selected_rows['brand_id'].item()] = 5
 
-
         # new_brand_ratings = {204: 5, 506: 4, 393: 3}
         new_matrix = self.add_new_user_ratings(new_user_id, new_cosme_ratings)
 
         recommended = self.infer(rating_matrix=new_matrix, current_user=new_user_id)
 
         to_recommend = self.parse_dataframe(recommended)
-        return to_recommend
+        
+        product_ids = [ product["id"] for product in to_recommend ]
+        
+        products = self.get_product_info(product_ids=product_ids)
+        
+        return products
 
+    def get_product_info(self, product_ids: list[int]):
+        
+        products = []
+        
+        for id in product_ids:
+            
+            indices_cosmetics = self.distinct_cosmetics["brand_id"] == id
+            cosmetic_info = self.distinct_cosmetics[indices_cosmetics]
+            
+            if cosmetic_info.empty:
+                continue
+            
+            cosmetic_info = cosmetic_info.iloc[0]
+            
+            indices_ingredient = self.ingredient_dataset["brand_id"] == id
+            ingredient_info = self.ingredient_dataset[indices_ingredient]
+            
+            product = {
+                "id": int(cosmetic_info["brand_id"]),
+                "name": cosmetic_info["brand"],
+                "category": cosmetic_info["category"],
+                "skin_type": cosmetic_info["skin_type"],
+                "contents": [ cosmetic_info["select_1_content"], cosmetic_info["select_2_content"], cosmetic_info["select_3_content"] ],
+                "image_url": None,
+                "ingredients": None
+            }
+            
+            if ingredient_info.empty:
+                product["image_url"] = None
+                product["ingredients"] = None
+                products.append(product)
+                continue
+                
+            ingredient_info = ingredient_info.iloc[0]
+            
+            product["image_url"] = ingredient_info["product_image_url"]
+            product["ingredients"] = ingredient_info["ingredients_list"]
+            products.append(product)
+            
+        return products
 
-collabo_filter = CollaborationFilter()
-# to_recommended = collabo_filter.get_filter_list('리얼베리어 익스트림 크림')
+collabo_filter = CollaborationFilter(filepath="resource/data/collabo_filtering_dataset2.csv")
+# to_recommended = collabo_filter.get_filter_list('AHC 온리 포맨 토너')
+# to_recommended = collabo_filter.get_filter_list('식물나라 카렌둘라 진정 토너, 라운드랩 소나무 진정 시카 토너, 라네즈 워터뱅크 블루히알루로닉 세럼')
+# to_recommended = collabo_filter.get_filter_list('구달 맑은 어성초 진정 수분크림, 피캄 베리어 사이클 락토P 토너') #
 # print(to_recommended)

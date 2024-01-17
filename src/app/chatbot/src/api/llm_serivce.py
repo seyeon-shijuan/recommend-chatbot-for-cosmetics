@@ -1,54 +1,27 @@
-import configparser
 from src.model.llm.polyglot_ko import PolyglotKo
 from src.model.llm.koalpaca import KoAlpaca
-from enum import Enum
-from functools import reduce
 from pydantic import BaseModel
 import configparser
-from fastapi.logger import logger
-
-class RoleType(Enum):
-    QUESTION = "QUESTION"
-    ANSWER = "ANSWER"
-
-class Message(BaseModel):
-    role: RoleType
-    content: str
-        
-    def to_query(self) -> str:
-        return f"### {self.role.value}: {self.content}\n\n"
-        
-class Prompt(BaseModel):
-    state: list[Message]
-    text: str
-    
-    def __init__(self, **data):
-        super().__init__(**data)
-        query = Message(role=RoleType.QUESTION, content=self.text)
-        self.state.append(query)
-        
-    def get_messages(self) -> list[Message]:
-        return self.state
-    
-    def to_prompt(self) -> str:
-        prompt = reduce(lambda prompt, msg: prompt + msg.to_query(), self.state, "")
-        return prompt
+from src.api.query_builder import QueryProcessor
+from src.api.request import *
     
 class PromptResponse(BaseModel):
     state: list[Message]
     answer: str
+    products: list
     
 class LLMServer():
     
-    def __init__(self):
-        
+    def __init__(self, query_processor: QueryProcessor):
+        pass
         config = configparser.ConfigParser()
         config.read("config.env")
         model_config = config["model"]
         model_name = model_config["Model-Name"]
         
+        self.query_processor = query_processor
+        
         self._model = None
-        logger.info(f"Model: {model_name}")
         if model_name == "PolyglotKo":
             self._model = PolyglotKo()
         elif model_name == "KoAlpaca":
@@ -56,13 +29,14 @@ class LLMServer():
         else:
             raise ValueError(f"모델 이름이 유효하지 않습니다.({model_name})")
         
-        self._model._load_model()
+        self._model.configure_pipeline()
             
     def inference(self, prompt: Prompt) -> PromptResponse:
         
+        prompt, product_list = self.query_processor.build(prompt)
         query = prompt.to_prompt()
         answer = self._model.ask(query=query)
+        return PromptResponse(state=prompt.get_messages(), answer=answer, products=product_list)
         
-        return PromptResponse(state=prompt.get_messages(), answer=answer)
-        
-llm_service = LLMServer()
+query_processor = QueryProcessor()
+llm_service = LLMServer(query_processor=query_processor)

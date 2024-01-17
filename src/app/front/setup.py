@@ -13,7 +13,8 @@ setup(
         "streamlit",
         "pandas",
         "sqlite3",
-        "requests"
+        "requests",
+        "streamlit_lottie"
     ],
     entry_points={
         'console_scripts': [

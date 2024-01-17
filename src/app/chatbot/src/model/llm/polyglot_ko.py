@@ -2,11 +2,11 @@ import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig, pipeline, Pipeline
 from peft import PeftModel, PeftConfig
 from src.model.llm.rag_chain import RAGChain
+from fastapi.logger import logger
 
 class PolyglotKo(RAGChain):
-    
-    def configure_pipeline() -> Pipeline:
-        model_id = super._config["Id-Fine-Tuning"]
+    def configure_pipeline(self) -> Pipeline:
+        model_id = self._config["Id-Fine-Tuning"]
         config = PeftConfig.from_pretrained(pretrained_model_name_or_path=model_id)
         bnb_config = BitsAndBytesConfig(
             load_in_4bit=True,

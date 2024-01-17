@@ -19,6 +19,7 @@ class RecommendationAPIRouter:
 
     def recommend_product(self, product_name):
         product_list = self.collabo_filter.get_filter_list(product_name=product_name)
+        print(f"product_list: {product_list}")
         return { 
             "product_list": product_list 
         }
