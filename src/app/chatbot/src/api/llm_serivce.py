@@ -13,7 +13,7 @@ class PromptResponse(BaseModel):
 class LLMServer():
     
     def __init__(self, query_processor: QueryProcessor):
-        pass
+
         config = configparser.ConfigParser()
         config.read("config.env")
         model_config = config["model"]

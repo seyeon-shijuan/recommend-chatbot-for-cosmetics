@@ -1,16 +1,6 @@
 from enum import Enum
 from pydantic import BaseModel
 from functools import reduce
-from dataclasses import dataclass
-
-@dataclass
-class Product:
-    id: int
-    name: str
-    category: str
-    skin_type: str
-    contents: list[str]
-    image_url: str
     
 class RoleType(Enum):
     QUESTION = "질문"

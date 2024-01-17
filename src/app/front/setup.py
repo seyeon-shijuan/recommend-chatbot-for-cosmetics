@@ -6,14 +6,14 @@ setup(
     description='cosmetics front system',
     packages=[
         "src", 
-        "src/api"
+        "src/api",
         "src/pages"
     ],
     install_requires=[
         "streamlit",
         "pandas",
-        "sqlite3",
         "requests",
+        "streamlit_lottie",
         "streamlit_lottie"
     ],
     entry_points={
