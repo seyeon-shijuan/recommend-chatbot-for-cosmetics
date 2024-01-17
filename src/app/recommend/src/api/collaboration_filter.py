@@ -5,7 +5,9 @@ import operator
 class CollaborationFilter():
     def __init__(self):
         cosmetics = pd.read_csv('resource/data/collabo_filtering_dataset.csv')
+        self.ingredient_dataset = pd.read_csv('resource/data/mapped_ingredient_dataset.csv')
         self.cosmetics = cosmetics.drop_duplicates(subset='brand_id')
+        self.distinct_cosmetics = cosmetics.drop_duplicates(subset="brand_id", keep="first")
         rating_matrix = self.cosmetics.pivot_table(index='user_id', columns='brand_id', values='rate')
         
         # replace NaN values with 0
@@ -117,7 +119,7 @@ class CollaborationFilter():
         result = product_list
         return result
 
-    def get_filter_list(self, product_name) -> list[str]:
+    def get_filter_list(self, product_name) -> list:
 
         '''추천 리스트 반환 api'''
 
@@ -142,8 +144,53 @@ class CollaborationFilter():
         recommended = self.infer(rating_matrix=new_matrix, current_user=new_user_id)
 
         to_recommend = self.parse_dataframe(recommended)
-        return to_recommend
+        
+        product_ids = [ product["id"] for product in to_recommend ]
+        
+        products = self.get_product_info(product_ids=product_ids)
+        
+        return products
 
+    def get_product_info(self, product_ids: list[int]):
+        
+        products = []
+        
+        for id in product_ids:
+            
+            indices_cosmetics = self.distinct_cosmetics["brand_id"] == id
+            cosmetic_info = self.distinct_cosmetics[indices_cosmetics]
+            
+            if cosmetic_info.empty:
+                continue
+            
+            cosmetic_info = cosmetic_info.iloc[0]
+            
+            indices_ingredient = self.ingredient_dataset["brand_id"] == id
+            ingredient_info = self.ingredient_dataset[indices_ingredient]
+            
+            product = {
+                "id": int(cosmetic_info["brand_id"]),
+                "name": cosmetic_info["brand"],
+                "category": cosmetic_info["category"],
+                "skin_type": cosmetic_info["skin_type"],
+                "contents": [ cosmetic_info["select_1_content"], cosmetic_info["select_2_content"], cosmetic_info["select_3_content"] ],
+                "image_url": None,
+                "ingredients": None
+            }
+            
+            if ingredient_info.empty:
+                product["image_url"] = None
+                product["ingredients"] = None
+                products.append(product)
+                continue
+                
+            ingredient_info = ingredient_info.iloc[0]
+            
+            product["image_url"] = ingredient_info["product_image_url"]
+            product["ingredients"] = ingredient_info["ingredients_list"]
+            products.append(product)
+            
+        return products
 
 collabo_filter = CollaborationFilter()
 # to_recommended = collabo_filter.get_filter_list('리얼베리어 익스트림 크림')

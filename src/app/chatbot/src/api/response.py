@@ -7,6 +7,7 @@ class Product:
     category: str
     skin_type: str
     contents: list[str]
+    ingredients: str
 
 @dataclass
 class CollaboFilterResponse:
