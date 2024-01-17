@@ -46,7 +46,7 @@ class QueryProcessor():
 
 
     def product2query(self, idx: int, product: Product) -> str:
-        query = f" {idx}번째 추천 상품 {product['name']}는 {product['name']} 카테고리에 속하고, {product['name']}. "
-        product_contents = [ f"{content}. " for content in product['name'] ]
+        query = f" {idx}번째 추천 상품 {product['name']}는 {product['category']} 카테고리에 속하고, {product['skin_type']}. "
+        product_contents = [ f"{content}. " for content in product['contents'] ]
         query += f" 또한 다음과 같은 효과가 있어요. {product_contents}\n\n"
         return query
