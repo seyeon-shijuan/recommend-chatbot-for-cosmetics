@@ -7,19 +7,22 @@ from langchain.schema.runnable import RunnablePassthrough
 from langchain.chains.query_constructor.base import AttributeInfo
 from langchain_community.vectorstores import Chroma
 from fastapi.logger import logger
+from typing import Union
 
 class RAGChain(ModelChain):
     
     def __init__(self):
-        self._is_apply_rag = super._config["RAG-Apply"]
+        super().__init__()
+    #     self._config = super().configure()
+    #     self._pipe = super().configure_pipeline()
+        self._is_apply_rag = self._config["RAG-Apply"]
         if self._is_apply_rag:
-            self._rag_model_name = super._config["RAG-Id"]
+            self._rag_model_name = self._config["RAG-Id"]
             logger.info(f"RAG: {self._rag_model_name}")
             self._retriever = self._load_retriever()
-            self._rag_chain = self._load_rag_chain()
         
     def _load_retriever(self):
-        model_name = super._config["RAG-Id"]
+        model_name = self._config["RAG-Id"]
         encode_kwargs = {'normalize_embeddings': True}
         ko_embedding = HuggingFaceEmbeddings(
             model_name=model_name,
@@ -33,23 +36,23 @@ class RAGChain(ModelChain):
         )
         return _retriever
     
-    def _load_rag_chain(self):
+    def ask(self, query: str) -> str:
         prompt_template = """
         ### [INST]
         Instruction: 화장품 정보와 화장품을 사용한 사용자의 리뷰입니다.
         화장품 정보와 리뷰를 참고하여 최대 3개의 상품을 추천하고 추천하는 이유를 답변하세요.
-        반복 답변하지 않습니다.
         Here is context to help:
 
         {context}
 
-        ### 질문: {question}
+        {question}
 
 
         ### 답변: [/INST]
         """
-        
-        llm = HuggingFacePipeline(pipeline=super._pipe)
+        ### 
+
+        llm = HuggingFacePipeline(pipeline=self._pipe)
         
         prompt = PromptTemplate(
             input_variables=["context", "question"],
@@ -62,14 +65,11 @@ class RAGChain(ModelChain):
         {"context": self._retriever, "question": RunnablePassthrough()}
             | llm_chain
         )
-        return _rag_chain
-
-    def ask(self, query: str) -> str:
         
         if not self._is_apply_rag:
             return super.ask(query=query)
 
-        result = self._rag_chain.invoke(query)    
+        result = _rag_chain.invoke(query)    
         answer = result['text']
         
         return answer

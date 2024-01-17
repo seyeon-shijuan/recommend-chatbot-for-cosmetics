@@ -1,4 +1,4 @@
-import configparser
+from sympy import Union
 from src.model.llm.polyglot_ko import PolyglotKo
 from src.model.llm.koalpaca import KoAlpaca
 from enum import Enum
@@ -56,11 +56,13 @@ class LLMServer():
         else:
             raise ValueError(f"모델 이름이 유효하지 않습니다.({model_name})")
         
-        self._model._load_model()
+        # self._model.configure_pipeline()
             
     def inference(self, prompt: Prompt) -> PromptResponse:
         
         query = prompt.to_prompt()
+        # query = 쿼리빌더(prompt)
+
         answer = self._model.ask(query=query)
         
         return PromptResponse(state=prompt.get_messages(), answer=answer)
