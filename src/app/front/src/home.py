@@ -99,6 +99,10 @@ def randing():
     if "last_interaction_time" not in st.session_state:
         st.session_state.last_interaction_time = time.time()
 
+    # 채팅 종료 메시지를 보여줄지 여부를 결정하는 변수
+    if "show_chat_end_message" not in st.session_state:
+        st.session_state.show_chat_end_message = False
+
     # Initialize chat history
     if "messages" not in st.session_state:
         st.session_state.messages = []
