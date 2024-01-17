@@ -5,8 +5,8 @@ from configparser import ConfigParser
 
 class ModelChain(ABC):
     
-    _pipe: Pipeline = None
     _config: ConfigParser = None
+    _pipe: Pipeline = None
     
     def __init__(self):
         self._config = self.configure()
@@ -19,13 +19,13 @@ class ModelChain(ABC):
         return model_config
         
     @abstractmethod
-    def configure_pipeline() -> Pipeline:
+    def configure_pipeline(self) -> Pipeline:
         pass
         
     def ask(self, query: str) -> str:
         
-        q = f"{query}\n\n### 답변:"
-        ans = self._pipe(q + "\n\n### 답변:")
+        query = f"{query}\n\n### 답변:"
+        ans = self._pipe(query)
         answer = ans[0]["generated_text"]
         
         if "###" in answer:

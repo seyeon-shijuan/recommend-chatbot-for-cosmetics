@@ -1,4 +1,4 @@
-import configparser
+from sympy import Union
 from src.model.llm.polyglot_ko import PolyglotKo
 from src.model.llm.koalpaca import KoAlpaca
 from pydantic import BaseModel
@@ -30,10 +30,9 @@ class LLMServer():
         else:
             raise ValueError(f"모델 이름이 유효하지 않습니다.({model_name})")
         
-        self._model._load_model()
+        # self._model.configure_pipeline()
             
     def inference(self, prompt: Prompt) -> PromptResponse:
-        
         
         query, product_list = self.query_processor.build(prompt)
         answer = self._model.ask(query=query)
