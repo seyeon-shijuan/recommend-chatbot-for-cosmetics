@@ -41,7 +41,6 @@ class QueryProcessor():
         query_parameter = f"product_name={product_string}"
         url = f"http://{host}:{port}{end_point_collabo}?{query_parameter}"
         response = requests.get(url=url)
-        print(f"response: {response.json()}")
         product_response = CollaboFilterResponse(**response.json())
         return product_response
 
