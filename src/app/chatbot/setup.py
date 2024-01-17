@@ -16,7 +16,7 @@ setup(
         "pydantic",
         "transformers",
         "peft",
-        "pytorch",
+        "torch",
         "langchain",
         "langchain_community"
     ],

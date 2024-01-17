@@ -8,12 +8,9 @@ POST http://localhost:8080/prompt
 Content-Type: application/json
 
 {
-    "messages": [
-        {
-            "role": "QUESTION",
-            "content": "화장품 아무거나 추천해줘"
-        }
-    ]
+    "state": [],
+    "text": "",
+    "product_list": ["에스트라 아토베리어365 하이드로 에센스"]
 }
 
 ###
