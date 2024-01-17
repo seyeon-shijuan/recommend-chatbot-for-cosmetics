@@ -15,7 +15,7 @@ class QueryProcessor():
         config.read("config.env")
         self.api_recommend = config["API-recommend"]
     
-    def build(self, prompt: Prompt) -> tuple[str, CollaboFilterResponse]:    
+    def build(self, prompt: Prompt) -> tuple[Prompt, CollaboFilterResponse]:
         
         if prompt.product_list:
             
@@ -27,10 +27,11 @@ class QueryProcessor():
             
             query = reduce(lambda query, q: query + q, query_list, "")
             query += " 위 내용을 바탕으로 상품 추천 질문에 대한 답변을 해주세요."
-            return query, product_response.product_list
+            prompt.add_question(query)
+            return prompt, product_response.product_list
         
         else:
-            return prompt.to_prompt(), []
+            return prompt, []
         
     def request_collabo_filter(self, product_list: list[Product]) -> CollaboFilterResponse:
         product_string = ",".join(product_list)

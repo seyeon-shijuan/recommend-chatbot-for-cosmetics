@@ -33,7 +33,8 @@ class LLMServer():
             
     def inference(self, prompt: Prompt) -> PromptResponse:
         
-        query, product_list = self.query_processor.build(prompt)
+        prompt, product_list = self.query_processor.build(prompt)
+        query = prompt.to_prompt()
         answer = self._model.ask(query=query)
         return PromptResponse(state=prompt.get_messages(), answer=answer, products=product_list)
         
