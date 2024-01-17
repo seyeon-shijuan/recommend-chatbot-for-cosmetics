@@ -26,7 +26,7 @@ class QueryProcessor():
             ]
             
             query = reduce(lambda query, q: query + q, query_list, "")
-            query += " 위 내용을 바탕으로 상품 추천 질문에 대한 답변을 해주세요."
+            query += " 위 내용을 바탕으로 화장품 추천 질문에 대한 답변을 해주세요."
             prompt.add_question(query)
             return prompt, product_response.product_list
         

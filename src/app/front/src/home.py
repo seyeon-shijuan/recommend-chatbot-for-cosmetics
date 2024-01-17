@@ -145,7 +145,7 @@ def randing():
                     state = response_json["state"]
                     answer = response_json["answer"]
                     st.session_state.prompt_state.append(state[-1])
-                    st.session_state.prompt_state.append({"role":"ANSWER", "content":answer})
+                    st.session_state.prompt_state.append({"role":"답변", "content":answer})
                     
                 else:
                     answer = "서비스 오류가 발생했습니다. 다시 시도해주세요."
