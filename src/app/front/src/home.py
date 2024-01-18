@@ -5,16 +5,21 @@ import sqlite3
 import requests
 import pandas as pd
 from config import load
+from bs4 import BeautifulSoup
 import json
 from streamlit_lottie import st_lottie
+from urllib.parse import quote
+from streamlit import session_state
+
+# 성분알리미 페이지 전환목적
+if 'page' not in st.session_state:
+    st.session_state.page = "home"
 
 # Initialize chat history
 if "messages" not in st.session_state:
     st.session_state.messages = []
     st.session_state.prompt_state = []
-<<<<<<< HEAD
     st.session_state.image_messages = []
-=======
 
 config = load()
 api_config = config["api"]
@@ -35,7 +40,7 @@ def request_chat(text: str, product_names: list[str] = []) -> tuple[str, dict]:
         response_json = response.json()
         state = response_json["state"]
         answer = response_json["answer"]
-        product_list = response_json["product_list"]
+        product_list = response_json["products"]
         if not product_list:
             st.session_state.prompt_state.append(state[-1])
             st.session_state.prompt_state.append({"role":"답변", "content":answer})
@@ -43,7 +48,6 @@ def request_chat(text: str, product_names: list[str] = []) -> tuple[str, dict]:
         return answer, product_list
     else:
         return "서비스 오류가 발생했습니다. 다시 시도해주세요.", []
->>>>>>> 0cf251e2c08e460ee323c122cfe58936bb6de745
 
 def randing():
     
@@ -120,48 +124,63 @@ def randing():
     
     selected_products = st.multiselect('', product_list, placeholder = 'ex) 구달 맑은 어성초 진정 수분 토너')
     if st.button('추천받기'):
-        #협업 필터링으로 추천상품 반환. 데이터 형태는 아래처럼 짰음
-        rec_product = [
-                    {"image_url": "https://image.oliveyoung.co.kr/uploads/images/goods/550/10/0000/0019/A00000019835702ko.jpg?l=ko",
-                    'product_info': {"link_url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000198357&dispCatNo=90000010009&trackingCd=Best_Sellingbest&t_page=%EB%9E%AD%ED%82%B9&t_click=%ED%8C%90%EB%A7%A4%EB%9E%AD%ED%82%B9_%EC%8A%A4%ED%82%A8%EC%BC%80%EC%96%B4_%EC%83%81%ED%92%88%EC%83%81%EC%84%B8&t_number=10",
-                                    "caption": "라로슈포제 시카플라스트 밤"}},
-                    {"image_url": "https://image.oliveyoung.co.kr/uploads/images/goods/550/10/0000/0017/A00000017131219ko.jpg?l=ko",
-                    'product_info': {"link_url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000171312&dispCatNo=90000010009&trackingCd=Best_Sellingbest&t_page=%EB%9E%AD%ED%82%B9&t_click=%ED%8C%90%EB%A7%A4%EB%9E%AD%ED%82%B9_%EC%8A%A4%ED%82%A8%EC%BC%80%EC%96%B4_%EC%83%81%ED%92%88%EC%83%81%EC%84%B8&t_number=22",
-                                    "caption": "달바 화이트 트러플 퍼스트 스프레이 세럼 100ml"}},
-                    {"image_url": "https://image.oliveyoung.co.kr/uploads/images/goods/550/10/0000/0019/A00000019067724ko.jpg?l=ko",
-                    'product_info': {"link_url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000190677&dispCatNo=90000010009&trackingCd=Best_Sellingbest&t_page=%EB%9E%AD%ED%82%B9&t_click=%ED%8C%90%EB%A7%A4%EB%9E%AD%ED%82%B9_%EC%8A%A4%ED%82%A8%EC%BC%80%EC%96%B4_%EC%83%81%ED%92%88%EC%83%81%EC%84%B8&t_number=27",
-                                    "caption": "토리든 다이브인 저분자 히알루론산 수딩 크림 100ml"}}
-                ]
+        #request_chat으로 추천상품 반환하기
+        answer, product_list = request_chat(text="", product_names=selected_products)
+        
+        #이미지 none인 경우
+        default_image = "https://www.generationsforpeace.org/wp-content/uploads/2018/03/empty.jpg"
 
-        expander_columns = st.columns(len(rec_product))
+        #테스트용 임의데이터
+        # answer, product_list = "이런 이유때문에 추천합니다.", [{
+        #     "id": 10,
+        #     "name": "라로슈포제 시카플라스트 밤",
+        #     "category": "밤",
+        #     "skin_type": "지성에 좋아요",
+        #     "contents": ["지성에 좋아요", "진정에 좋아요", "자극적이에요"],
+        #     "image_url": "https://image.oliveyoung.co.kr/uploads/images/goods/550/10/0000/0019/A00000019835702ko.jpg?l=ko", # None 일 수도 있음 (없을 경우)
+        #     "ingredients": "정제수, 약모밀추출물(15%), 글리세린, 판테놀, 소듐레불리네이트" # None 일 수도 있음 (없을 경우)
+        #     },
+        #     {
+        #     "id": 20,
+        #     "name": "달바 화이트 트러플 퍼스트 스프레이 세럼 100ml",
+        #     "category": "세럼",
+        #     "skin_type": "복합성에 좋아요",
+        #     "contents": ["복합성에 좋아요", "여드름에 좋아요", "자극없이 순해요"],
+        #     "image_url": "https://image.oliveyoung.co.kr/uploads/images/goods/550/10/0000/0017/A00000017131219ko.jpg?l=ko", # None 일 수도 있음 (없을 경우)
+        #     "ingredients": "글리세린, 판테놀, 소듐레불리네이트" # None 일 수도 있음 (없을 경우)
+        #     },
+        #     {
+        #     "id": 30,
+        #     "name": "토리든 다이브인 저분자 히알루론산 수딩 크림 100ml",
+        #     "category": "크림",
+        #     "skin_type": "건성에 좋아요",
+        #     "contents": ["건성에 좋아요", "보습에 좋아요", "자극이 조금 있어요"],
+        #     "image_url": "https://image.oliveyoung.co.kr/uploads/images/goods/550/10/0000/0019/A00000019067724ko.jpg?l=ko", # None 일 수도 있음 (없을 경우)
+        #     "ingredients": "소듐레불리네이트" # None 일 수도 있음 (없을 경우)
+        #     }
+        #     ]
+        
+        expander_columns = st.columns(len(product_list))
 
-        for index, (image_info, expander_column) in enumerate(zip(rec_product, expander_columns)):
-            image_with_link = f'<a href="{image_info["product_info"]["link_url"]}" target="_blank"><img src="{image_info["image_url"]}" width="200"></a>'
-
+        for index, (product_info, expander_column) in enumerate(zip(product_list, expander_columns)):
+            product_name = product_info.get("name", "")
+            encoded_product_name = quote(product_name)  # 띄어쓰기를 %20으로 인코딩
+            product_image = product_info.get("image_url","")
+            image_url = product_image if product_image is not None else default_image
+            search_url = f'https://www.oliveyoung.co.kr/store/search/getSearchMain.do?query={encoded_product_name}&giftYn=N&t_page=홈&t_click=검색창&t_search_name={encoded_product_name}'
+                    
+            # 제품 이미지에 하이퍼링크를 추가하여 출력
+            image_with_link = f'<a href="{search_url}" target="_blank"><img src="{product_info["image_url"]}" width="200"></a>'
             with expander_column:
-                with st.expander(f"{image_info['product_info']['caption']}"):
+                with st.expander(f"{product_name}"):
                     st.markdown(image_with_link, unsafe_allow_html=True)
-                    # 각 상품에 대한 추천 이유를 담은 답변 창 추가
-                    explanation = st.text_area(f"상품 {index + 1}에 대한 추천 이유", f"이 상품은 {image_info['product_info']['caption']}의 특징 때문에 추천합니다.")
 
-        # explanations = []
-
-        # for index, image_info in enumerate(rec_product):
-        #     image_with_link = f'<a href="{image_info["product_info"]["link_url"]}" target="_blank"><img src="{image_info["image_url"]}" width="200"></a>'
-            
-        #     with st.expander(f"{image_info['product_info']['caption']}"):
-        #         st.markdown(image_with_link, unsafe_allow_html=True)
-                
-        #         # 각 상품에 대한 추천 이유를 담은 답변 창 추가. 답변 받아오는 것 추가 필요
-        #         explanation = st.text_area("추천 이유", f"이 상품은 {image_info['product_info']['caption']}의 특징 때문에 추천합니다.")
-        #         explanations.append(explanation)
-
-        # #Expand 창 생성
-        # for image_info in rec_product:
-        #     image_with_link = f'<a href="{image_info["product_info"]["link_url"]}" target="_blank"><img src="{image_info["image_url"]}" width="200"></a>'
-        #     with st.expander(f"{image_info['product_info']['caption']}"):
-        #         st.markdown(image_with_link, unsafe_allow_html=True)
-
+        explanation = st.text_area(f"상품 추천 이유", answer)
+    
+        #성분알리미로 넘어가기
+        if st.button('잘 모르겠는 성분이 있나요? 성분알리미에게 물어보세요!'):
+            session_state.active_page = "ingredient_dict"
+            #안넘어감...
 
     st.markdown("<hr>", unsafe_allow_html=True)
     chatbot_startanime = 'resource/data/chatbot_start.json'
@@ -192,28 +211,8 @@ def randing():
             assistant_response = ""
             with st.spinner("답변을 기다리는 중입니다..."):
                 
-                api_config = config["api"]
-                
-                chat_api_config = api_config["chat"]
-                recommend_api_config = api_config["recommend"]
-                
-                data = {
-                    "state": st.session_state.prompt_state,
-                    "text": prompt
-                }
-
-                # response = requests.post(url=f"http://{chat_api_config['host']}:{chat_api_config['port']}/prompt", json=data)
-                
-                # if response.status_code == 200:
-                #     response_json = response.json()
-                #     state = response_json["state"]
-                #     answer = response_json["answer"]
-                #     st.session_state.prompt_state.append(state[-1])
-                #     st.session_state.prompt_state.append({"role":"ANSWER", "content":answer})
-                    
-                # else:
-                #     answer = "서비스 오류가 발생했습니다. 다시 시도해주세요."
-                assistant_response = "답변"
+                answer, _ = request_chat(text=prompt)#추천안받을거라서 product_list 대신 _
+                assistant_response = answer
 
 
             if "스킨케어 추천" in prompt:
