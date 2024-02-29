@@ -13,8 +13,6 @@ class RAGChain(ModelChain):
     
     def __init__(self):
         super().__init__()
-    #     self._config = super().configure()
-    #     self._pipe = super().configure_pipeline()
         self._is_apply_rag = self._config["RAG-Apply"]
         if self._is_apply_rag:
             self._rag_model_name = self._config["RAG-Id"]
@@ -50,7 +48,6 @@ class RAGChain(ModelChain):
 
         ### 답변: [/INST]
         """
-        ### 
 
         llm = HuggingFacePipeline(pipeline=self._pipe)
         
@@ -69,7 +66,8 @@ class RAGChain(ModelChain):
         if not self._is_apply_rag:
             return super.ask(query=query)
 
-        result = _rag_chain.invoke(query)    
+        result = _rag_chain.invoke(query) 
+        print(f'answer: {result}')
         answer = result['text']
         
         return answer

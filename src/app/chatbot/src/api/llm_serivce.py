@@ -13,7 +13,6 @@ class PromptResponse(BaseModel):
 class LLMServer():
     
     def __init__(self, query_processor: QueryProcessor):
-
         config = configparser.ConfigParser()
         config.read("config.env")
         model_config = config["model"]
@@ -28,9 +27,7 @@ class LLMServer():
             self._model = KoAlpaca()
         else:
             raise ValueError(f"모델 이름이 유효하지 않습니다.({model_name})")
-        
-        self._model.configure_pipeline()
-            
+
     def inference(self, prompt: Prompt) -> PromptResponse:
         
         prompt, product_list = self.query_processor.build(prompt)
