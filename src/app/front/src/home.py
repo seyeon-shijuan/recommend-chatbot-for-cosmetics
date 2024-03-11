@@ -1,4 +1,3 @@
-# 가영님
 import streamlit as st
 import time
 import sqlite3
@@ -10,6 +9,7 @@ import json
 from streamlit_lottie import st_lottie
 from urllib.parse import quote
 from streamlit import session_state
+from requests.exceptions import ConnectionError
 
 # 성분알리미 페이지 전환목적
 if 'page' not in st.session_state:
@@ -26,28 +26,36 @@ api_config = config["api"]
 chat_api_config = api_config["chat"]
 recommend_api_config = api_config["recommend"]
 
-def request_chat(text: str, product_names: list[str] = []) -> tuple[str, dict]:
+def request_chat(text: str, product_names: list[str] = []) -> tuple[str, list]:
     
+    print(f"Start request chat:\n{text}")
     data = {
         "state": st.session_state.prompt_state,
         "text": text,
         "product_list": product_names
     }
     
-    response = requests.post(url=f"http://{chat_api_config['host']}:{chat_api_config['port']}/prompt", json=data)
+    try:
+        response = requests.post(url=f"http://{chat_api_config['host']}:{chat_api_config['port']}/prompt", json=data)
+        if response.status_code == 200:
+            response_json = response.json()
+            state = response_json["state"]
+            answer = response_json["answer"]
+            product_list = response_json["products"]
+            print(f"### state:\n{state}")
+            print(f"### product_list:\n{product_list}")
+            if not product_list:
+                st.session_state.prompt_state.append(state[-1])
+                st.session_state.prompt_state.append({"role":"답변", "content":answer})
+            print(f"Success request chat")
+            return answer, product_list
+        else:
+            print(f"Faile request chat")
+            return "매칭되는 추천상품이 없어서 대신 누구나 사용하기 좋은 상품을 추천드려요.", []
+    except ConnectionError:
+        return "서버와의 연결이 원활하지 않아요. 잠시 후 다시 시도해주세요.", []
                 
-    if response.status_code == 200:
-        response_json = response.json()
-        state = response_json["state"]
-        answer = response_json["answer"]
-        product_list = response_json["products"]
-        if not product_list:
-            st.session_state.prompt_state.append(state[-1])
-            st.session_state.prompt_state.append({"role":"답변", "content":answer})
-        
-        return answer, product_list
-    else:
-        return "서비스 오류가 발생했습니다. 다시 시도해주세요.", []
+    
 
 def randing():
     
@@ -55,6 +63,7 @@ def randing():
     st.markdown("🧙‍♂️피부요정 뽀야미에게 맡겨만 주세요!")
 
     # SQLite 데이터베이스 연결
+    print(f"Start Connect Databse")
     conn = sqlite3.connect('resource/data/user_data.db')
     cursor = conn.cursor()
 
@@ -69,6 +78,7 @@ def randing():
         )
     ''')
     conn.commit()
+    print(f"End Connect Databse")
 
     st.markdown("""
     <style>
@@ -87,10 +97,10 @@ def randing():
     with st.form(key='columns_in_form'):
         age, gender, skin_type, skin_concern = st.columns(4)
 
-        age_selected = age.selectbox('나이', ['10대', '20대', '30대', '40대', '50대', '60대'], key='나이')
-        gender_selected = gender.selectbox('성별', ['남', '여'], key='성별')
-        skin_type_selected = skin_type.selectbox('피부타입', ['악건성', '건성', '중성·복합성', '지성', '민감성'], key='피부타입')
-        skin_concern_selected = skin_concern.selectbox('피부고민', ['여드름', '홍조', '모공', '각질', '블랙헤드', '요철'], key='피부고민')
+        age_selected = age.selectbox('나이', ['10대', '20대', '30대', '40대', '50대', '60대'], key='나이', label_visibility="collapsed")
+        gender_selected = gender.selectbox('성별', ['남', '여'], key='성별', label_visibility="collapsed")
+        skin_type_selected = skin_type.selectbox('피부타입', ['악건성', '건성', '중성·복합성', '지성', '민감성'], key='피부타입', label_visibility="collapsed")
+        skin_concern_selected = skin_concern.selectbox('피부고민', ['여드름', '홍조', '모공', '각질', '블랙헤드', '요철'], key='피부고민', label_visibility="collapsed")
 
         submitted = st.form_submit_button('제출')
 
@@ -122,65 +132,76 @@ def randing():
     product = df['brand'].tolist()
     product_list = list(set(product))
     
-    selected_products = st.multiselect('', product_list, placeholder = 'ex) 구달 맑은 어성초 진정 수분 토너')
-    if st.button('추천받기'):
-        #request_chat으로 추천상품 반환하기
-        answer, product_list = request_chat(text="", product_names=selected_products)
-        
-        #이미지 none인 경우
-        default_image = "https://www.generationsforpeace.org/wp-content/uploads/2018/03/empty.jpg"
-
-        #테스트용 임의데이터
-        # answer, product_list = "이런 이유때문에 추천합니다.", [{
-        #     "id": 10,
-        #     "name": "라로슈포제 시카플라스트 밤",
-        #     "category": "밤",
-        #     "skin_type": "지성에 좋아요",
-        #     "contents": ["지성에 좋아요", "진정에 좋아요", "자극적이에요"],
-        #     "image_url": "https://image.oliveyoung.co.kr/uploads/images/goods/550/10/0000/0019/A00000019835702ko.jpg?l=ko", # None 일 수도 있음 (없을 경우)
-        #     "ingredients": "정제수, 약모밀추출물(15%), 글리세린, 판테놀, 소듐레불리네이트" # None 일 수도 있음 (없을 경우)
-        #     },
-        #     {
-        #     "id": 20,
-        #     "name": "달바 화이트 트러플 퍼스트 스프레이 세럼 100ml",
-        #     "category": "세럼",
-        #     "skin_type": "복합성에 좋아요",
-        #     "contents": ["복합성에 좋아요", "여드름에 좋아요", "자극없이 순해요"],
-        #     "image_url": "https://image.oliveyoung.co.kr/uploads/images/goods/550/10/0000/0017/A00000017131219ko.jpg?l=ko", # None 일 수도 있음 (없을 경우)
-        #     "ingredients": "글리세린, 판테놀, 소듐레불리네이트" # None 일 수도 있음 (없을 경우)
-        #     },
-        #     {
-        #     "id": 30,
-        #     "name": "토리든 다이브인 저분자 히알루론산 수딩 크림 100ml",
-        #     "category": "크림",
-        #     "skin_type": "건성에 좋아요",
-        #     "contents": ["건성에 좋아요", "보습에 좋아요", "자극이 조금 있어요"],
-        #     "image_url": "https://image.oliveyoung.co.kr/uploads/images/goods/550/10/0000/0019/A00000019067724ko.jpg?l=ko", # None 일 수도 있음 (없을 경우)
-        #     "ingredients": "소듐레불리네이트" # None 일 수도 있음 (없을 경우)
-        #     }
-        #     ]
-        
-        expander_columns = st.columns(len(product_list))
-
-        for index, (product_info, expander_column) in enumerate(zip(product_list, expander_columns)):
-            product_name = product_info.get("name", "")
-            encoded_product_name = quote(product_name)  # 띄어쓰기를 %20으로 인코딩
-            product_image = product_info.get("image_url","")
-            image_url = product_image if product_image is not None else default_image
-            search_url = f'https://www.oliveyoung.co.kr/store/search/getSearchMain.do?query={encoded_product_name}&giftYn=N&t_page=홈&t_click=검색창&t_search_name={encoded_product_name}'
-                    
-            # 제품 이미지에 하이퍼링크를 추가하여 출력
-            image_with_link = f'<a href="{search_url}" target="_blank"><img src="{product_info["image_url"]}" width="200"></a>'
-            with expander_column:
-                with st.expander(f"{product_name}"):
-                    st.markdown(image_with_link, unsafe_allow_html=True)
-
-        explanation = st.text_area(f"상품 추천 이유", answer)
+    selected_products = st.multiselect('선택된 상품들', product_list, placeholder = 'ex) 구달 맑은 어성초 진정 수분 토너', label_visibility="collapsed")
     
-        #성분알리미로 넘어가기
-        if st.button('잘 모르겠는 성분이 있나요? 성분알리미에게 물어보세요!'):
-            session_state.active_page = "ingredient_dict"
-            #안넘어감...
+    if st.button('추천받기'):
+        
+        if not selected_products:
+            st.info("1개이상 제품을 선택해주세요.")
+        else:
+            #request_chat으로 추천상품 반환하기
+            answer, product_list = request_chat(text="", product_names=selected_products)
+            
+            #이미지 none인 경우
+            default_image = "https://www.generationsforpeace.org/wp-content/uploads/2018/03/empty.jpg"
+
+            if not product_list:
+                product_list = [
+                    {
+                        "id": 10,
+                        "name": "라로슈포제 시카플라스트 밤",
+                        "category": "밤",
+                        "skin_type": "지성에 좋아요",
+                        "contents": ["지성에 좋아요", "진정에 좋아요", "자극적이에요"],
+                        "image_url": "https://image.oliveyoung.co.kr/uploads/images/goods/550/10/0000/0019/A00000019835702ko.jpg?l=ko", # None 일 수도 있음 (없을 경우)
+                        "ingredients": "정제수, 약모밀추출물(15%), 글리세린, 판테놀, 소듐레불리네이트" # None 일 수도 있음 (없을 경우)
+                    },
+                    {
+                        "id": 20,
+                        "name": "달바 화이트 트러플 퍼스트 스프레이 세럼 100ml",
+                        "category": "세럼",
+                        "skin_type": "복합성에 좋아요",
+                        "contents": ["복합성에 좋아요", "여드름에 좋아요", "자극없이 순해요"],
+                        "image_url": "https://image.oliveyoung.co.kr/uploads/images/goods/550/10/0000/0017/A00000017131219ko.jpg?l=ko", # None 일 수도 있음 (없을 경우)
+                        "ingredients": "글리세린, 판테놀, 소듐레불리네이트" # None 일 수도 있음 (없을 경우)
+                    },
+                    {
+                        "id": 30,
+                        "name": "토리든 다이브인 저분자 히알루론산 수딩 크림 100ml",
+                        "category": "크림",
+                        "skin_type": "건성에 좋아요",
+                        "contents": ["건성에 좋아요", "보습에 좋아요", "자극이 조금 있어요"],
+                        "image_url": "https://image.oliveyoung.co.kr/uploads/images/goods/550/10/0000/0019/A00000019067724ko.jpg?l=ko", # None 일 수도 있음 (없을 경우)
+                        "ingredients": "소듐레불리네이트" # None 일 수도 있음 (없을 경우)
+                    }
+                ]
+            
+            print(f"product_list:", product_list)
+            print(f"product list counts: {len(product_list)}")
+            expander_columns = st.columns(len(product_list))
+
+            print(f"Start rendering products")
+            for index, (product_info, expander_column) in enumerate(zip(product_list, expander_columns)):
+                print("product_info type ", type(product_info))
+                print("product_info", product_info)
+                product_name = product_info.get("name", "")
+                encoded_product_name = quote(product_name)  # 띄어쓰기를 %20으로 인코딩
+                product_image = product_info.get("image_url","")
+                image_url = product_image if product_image is not None else default_image
+                search_url = f'https://www.oliveyoung.co.kr/store/search/getSearchMain.do?query={encoded_product_name}&giftYn=N&t_page=홈&t_click=검색창&t_search_name={encoded_product_name}'
+                        
+                # 제품 이미지에 하이퍼링크를 추가하여 출력
+                image_with_link = f'<a href="{search_url}" target="_blank"><img src="{image_url}" width="200"></a>'
+                with expander_column:
+                    with st.expander(f"{product_name}"):
+                        st.markdown(image_with_link, unsafe_allow_html=True)
+            print(f"End rendering products")
+            explanation = st.text_area(f"상품 추천 이유", answer)
+        
+            #성분알리미로 넘어가기
+            if st.button('잘 모르겠는 성분이 있나요? 성분알리미에게 물어보세요!'):
+                session_state.active_page = "ingredient_dict"
+                #안넘어감...
 
     st.markdown("<hr>", unsafe_allow_html=True)
     chatbot_startanime = 'resource/data/chatbot_start.json'
@@ -199,22 +220,20 @@ def randing():
 
     # Accept user input
     if prompt := st.chat_input("말만 해요! 이 뽀야미가 해결해줄게요:)"):
-
+        print("Start prompt")
         # Add user message to chat history
         st.session_state["messages"].append({"role": "user", "content": prompt})
         # Display user message in chat message container
         with st.chat_message("user", avatar = '👩🏻'):
             st.markdown(prompt)
-
+        print("display prompt")
         # Display assistant response in chat message container
         with st.chat_message("assistant", avatar = '🧙‍♂️'): 
             assistant_response = ""
             with st.spinner("답변을 기다리는 중입니다..."):
-                
-                answer, _ = request_chat(text=prompt)#추천안받을거라서 product_list 대신 _
+                answer, _ = request_chat(text=prompt) # 추천안받을거라서 product_list 대신 _
                 assistant_response = answer
-
-
+                print("End chat request")
             if "스킨케어 추천" in prompt:
                 #이미지 3개
                 rec_product = [
@@ -245,19 +264,20 @@ def randing():
                                 st.empty()
                         
 
-                else:
-                    # Display assistant response in chat message container
-                    message_placeholder = st.empty()
+            else:
+                # Display assistant response in chat message container
+                message_placeholder = st.empty()
 
-                    # Simulate stream of response with milliseconds delay
-                    full_response = ""
-                    for chunk in assistant_response.split():
-                        full_response += chunk + " "
-                        time.sleep(0.08)
-                        # Add a blinking cursor to simulate typing
-                        message_placeholder.markdown(full_response + "▌")
-                        
-                    message_placeholder.markdown(full_response)
+                # Simulate stream of response with milliseconds delay
+                full_response = ""
+                assistant_response = "서버에서 응답을 받지 못했어요. 다시 시도해주세요." if not assistant_response else assistant_response
+                for chunk in assistant_response.split():
+                    full_response += chunk + " "
+                    time.sleep(0.08)
+                    # Add a blinking cursor to simulate typing
+                    message_placeholder.markdown(full_response + "▌")
+                    
+                message_placeholder.markdown(full_response)
 
                 # Add assistant response to chat history
                 st.session_state["messages"].append({"role":    "assistant", "content": assistant_response})

@@ -30,6 +30,7 @@ class ModelChain(ABC):
         
         if "###" in answer:
             answer = answer.split("###")[0]
+            print(f'model/llm/model_chain.py log: {answer}')
             
         return answer
         

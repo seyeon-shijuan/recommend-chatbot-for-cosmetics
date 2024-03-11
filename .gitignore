@@ -7,6 +7,9 @@
 /resource/data/
 .env
 *.yaml
+log_file.txt
+*.log
+*.ini
 
 # Created by https://www.toptal.com/developers/gitignore/api/windows,macos,visualstudiocode,pycharm,venv
 # Edit at https://www.toptal.com/developers/gitignore?templates=windows,macos,visualstudiocode,pycharm,venv

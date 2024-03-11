@@ -26,7 +26,7 @@ class QueryProcessor():
             ]
             
             query = reduce(lambda query, q: query + q, query_list, "")
-            query += " 위 내용을 바탕으로 화장품 추천 질문에 대한 답변을 해주세요."
+            query = "아래 상품을 추천받았습니다. 왜 추천하는지 설명하세요." + query
             prompt.add_question(query)
             return prompt, product_response.product_list
         
@@ -46,7 +46,7 @@ class QueryProcessor():
 
 
     def product2query(self, idx: int, product: Product) -> str:
-        query = f" {idx}번째 추천 상품 [{product['name']}]는 {product['category']} 카테고리에 속하고, {product['skin_type']}. "
-        product_contents = ". ".join(product['contents']) + "."
-        query += f" 또한 다음과 같은 효과가 있어요. {product_contents}\n\n"
+        query = f" {idx}번째 추천 상품 [{product['name']}]"#는 {product['category']} 카테고리에 속하고, {product['skin_type']}. "
+        # product_contents = ". ".join(product['contents']) + "."
+        # query += f" 또한 다음과 같은 효과가 있어요. {product_contents}\n\n"
         return query

@@ -4,7 +4,7 @@ GET http://localhost:8081/test?text=안녕
 ###
 
 # 협업 필터링 API
-GET http://localhost:8081/collabo/filters?product_name=에스트라 아토베리어365 하이드로 에센스
+GET http://localhost:8081/collabo/filters?product_name=구달 맑은 어성초 진정 수분크림, 피캄 베리어 사이클 락토P 토너, 아이소이 불가리안 로즈 블레미쉬 케어 업 크림
 
 ###
 

@@ -64,7 +64,7 @@ class RAGChain(ModelChain):
         )
         
         if not self._is_apply_rag:
-            return super.ask(query=query)
+            return super().ask(query=query)
 
         result = _rag_chain.invoke(query) 
         print(f'answer: {result}')

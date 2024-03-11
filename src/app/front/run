@@ -1,1 +1,1 @@
-streamlit run src/home.py --server.address 0.0.0.0 --server.port 8501
+streamlit run src/home.py --server.address 0.0.0.0 --server.port 8501 >> log_file.txt 2>&1
