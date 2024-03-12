@@ -139,9 +139,10 @@ def randing():
         if not selected_products:
             st.info("1개이상 제품을 선택해주세요.")
         else:
-            #request_chat으로 추천상품 반환하기
-            answer, product_list = request_chat(text="", product_names=selected_products)
-            
+            with st.spinner("추천과 답변을 기다리는 중입니다..."):
+                #request_chat으로 추천상품 반환하기
+                answer, product_list = request_chat(text="", product_names=selected_products)
+                
             #이미지 none인 경우
             default_image = "https://www.generationsforpeace.org/wp-content/uploads/2018/03/empty.jpg"
 
