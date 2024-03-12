@@ -37,12 +37,14 @@ class RAGChain(ModelChain):
     def ask(self, query: str) -> str:
         prompt_template = """
         ### [INST]
-        Instruction: 화장품 정보와 화장품을 사용한 사용자의 리뷰입니다.
-        화장품 정보와 리뷰를 참고하여 최대 3개의 상품을 추천하고 추천하는 이유를 답변하세요.
+        Instruction: 화장품 context 입니다.
+        화장품 정보와 리뷰를 참고하여 상품을 추천하고 추천하는 이유와 함께 질문에 답변하세요.
+        답변에 한글과 영어와 숫자만 사용하세요.
         Here is context to help:
 
         {context}
 
+        Here is Question:
         {question}
 
 
